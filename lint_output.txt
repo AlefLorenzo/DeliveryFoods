@@ -1,0 +1,69 @@
+
+> delivery-system@0.1.0 lint
+> eslint
+
+
+C:\Users\Buggynay\DeliveryFoods\app\(client)\cart\page.tsx
+   4:16  warning  'CardContent' is defined but never used                          @typescript-eslint/no-unused-vars
+   5:24  warning  'Minus' is defined but never used                                @typescript-eslint/no-unused-vars
+   6:8   warning  'Image' is defined but never used                                @typescript-eslint/no-unused-vars
+  17:15  warning  'orderId' is assigned a value but never used                     @typescript-eslint/no-unused-vars
+  28:72  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Buggynay\DeliveryFoods\app\(client)\orders\page.tsx
+   3:41  warning  'CardTitle' is defined but never used            @typescript-eslint/no-unused-vars
+  35:23  warning  'StatusIcon' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\(client)\restaurant\[id]\page.tsx
+  3:23  warning  'MapPin' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\(courier)\run\[id]\page.tsx
+  18:43  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Buggynay\DeliveryFoods\app\(courier)\run\[id]\page.tsx:18:43
+  16 |     useEffect(() => {
+  17 |         if (!order) return;
+> 18 |         if (order.status === 'PICKED_UP') setStep('DROPOFF');
+     |                                           ^^^^^^^ Avoid calling setState() directly within an effect
+  19 |         if (order.status === 'DELIVERED') setStep('COMPLETE');
+  20 |     }, [order]);
+  21 |  react-hooks/set-state-in-effect
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\dashboard\page.tsx
+  47:75  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\orders\page.tsx
+    3:41  warning  'CardTitle' is defined but never used     @typescript-eslint/no-unused-vars
+   92:63  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  101:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\page.tsx
+  2:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  4:20  warning  'Store' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\client\Header.tsx
+  3:45  warning  'Menu' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\client\ProductCard.tsx
+  4:16  warning  'CardContent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\client\RestaurantCard.tsx
+  3:41  warning  'CardHeader' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\ui\input.tsx
+  4:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\Users\Buggynay\DeliveryFoods\lib\store.ts
+  40:15  warning  'currentItems' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\tailwind.config.ts
+  75:15  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+Ô£û 21 problems (7 errors, 14 warnings)
+

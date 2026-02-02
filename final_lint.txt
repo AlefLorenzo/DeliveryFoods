@@ -1,0 +1,130 @@
+
+> delivery-system@0.1.0 lint
+> eslint
+
+
+C:\Users\Buggynay\DeliveryFoods\app\(client)\cart\page.tsx
+    3:24  error    'useOrderStore' is defined but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  125:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Buggynay\DeliveryFoods\app\(client)\home\page.tsx
+  99:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Buggynay\DeliveryFoods\app\(courier)\history\page.tsx
+  3:24  error  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\(courier)\layout.tsx
+  14:11  error  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\(courier)\run\[id]\page.tsx
+   13:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   23:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\dashboard\page.tsx
+  159:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\kitchen\page.tsx
+  142:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\layout.tsx
+  29:8  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\menu\page.tsx
+  105:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Buggynay\DeliveryFoods\app\(restaurant)\settings\page.tsx
+   5:10  error  'Button' is defined but never used            @typescript-eslint/no-unused-vars
+   6:24  error  'MapPin' is defined but never used            @typescript-eslint/no-unused-vars
+   6:44  error  'Save' is defined but never used              @typescript-eslint/no-unused-vars
+  12:12  error  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\api\courier\status\get_route_dummy.ts
+  17:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\app\api\debug\orders\route.ts
+  29:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\api\orders\history\route.ts
+  15:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\login\page.tsx
+   8:10  error  'useRouter' is defined but never used     @typescript-eslint/no-unused-vars
+  69:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\app\page.tsx
+  13:9  error  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\admin\ShiftConfig.tsx
+  38:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:18  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\components\client\Header.tsx
+   4:10  error    'Search' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   4:39  error    'User' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   6:10  error    'Input' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  83:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  95:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Buggynay\DeliveryFoods\components\shared\Chat.tsx
+   3:22  error  'Bot' is defined but never used            @typescript-eslint/no-unused-vars
+  16:13  error  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\lib\error-handler.ts
+  29:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:89  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\audit.service.ts
+  4:89  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\auth.service.ts
+  35:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:18  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  43:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:18  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\availability.service.ts
+  46:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\order.service.ts
+  23:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\restaurant.service.ts
+  2:10  error  'Restaurant' is defined but never used  @typescript-eslint/no-unused-vars
+  2:22  error  'Product' is defined but never used     @typescript-eslint/no-unused-vars
+  5:28  error  'lat' is defined but never used         @typescript-eslint/no-unused-vars
+  5:41  error  'lng' is defined but never used         @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\lib\services\token.service.ts
+  25:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:18  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  33:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:18  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\lib\store.ts
+   35:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:34  error  'state' is defined but never used         @typescript-eslint/no-unused-vars
+  283:34  error  'state' is defined but never used         @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\middleware.ts
+  11:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Buggynay\DeliveryFoods\prisma\seed.ts
+  24:11  error  'client' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  52:11  error  'courier' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  65:11  error  'restaurant' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Buggynay\DeliveryFoods\test-server.js
+  1:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Users\Buggynay\DeliveryFoods\test_full_flow.ts
+   1:10  error  'TokenService' is defined but never used  @typescript-eslint/no-unused-vars
+  26:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 63 problems (57 errors, 6 warnings)
+

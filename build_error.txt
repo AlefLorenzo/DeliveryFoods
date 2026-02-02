@@ -1,0 +1,14 @@
+
+> delivery-system@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.4 (Turbopack)
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./app/(restaurant)
+You cannot have two parallel pages that resolve to the same path. Please check /(client)/orders and /(restaurant).
+
+    at ignore-listed frames

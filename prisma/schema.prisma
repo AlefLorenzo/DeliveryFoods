@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          UserRole       @default(CLIENT)
+  avatar        String?
+  phone         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  auditLogs     AuditLog[]
+  courierStatus CourierStatus?
+  orders        Order[]        @relation("UserOrders")
+  ownedStores   Restaurant[]   @relation("RestaurantOwner")
+  details       UserDetail?
+  chatMessages  ChatMessage[]
+}
+
+model UserDetail {
+  id           String  @id @default(uuid())
+  userId       String  @unique
+  street       String
+  number       String
+  neighborhood String
+  city         String
+  state        String
+  zipCode      String
+  complement   String?
+  lat          Float?
+  lng          Float?
+  user         User    @relation(fields: [userId], references: [id])
+}
+
+model Restaurant {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  image         String?
+  ownerId       String
+  active        Boolean        @default(true)
+  rating        Float          @default(5.0)
+  deliveryFee   Float          @default(0)
+  minOrder      Float          @default(0)
+  avgTime       String?
+  lat           Float?
+  lng           Float?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  operatingDays OperatingDay[]
+  orders        Order[]
+  products      Product[]
+  owner         User           @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  shifts        Shift[]
+}
+
+model Product {
+  id           String      @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  image        String?
+  category     String
+  active       Boolean     @default(true)
+  restaurantId String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  shifts       Shift[]     @relation("ProductToShift")
+}
+
+model Order {
+  id            String          @id @default(uuid())
+  orderNumber   Int             @unique
+  userId        String
+  restaurantId  String
+  courierId     String?
+  status        OrderStatus     @default(PENDING)
+  total         Float
+  deliveryFee   Float
+  discount      Float           @default(0)
+  paymentMethod String
+  paymentStatus String          @default("PENDING")
+  transactionId String?         @unique
+  needsChange   Boolean         @default(false)
+  changeFor     Float?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  restaurant    Restaurant      @relation(fields: [restaurantId], references: [id])
+  user          User            @relation("UserOrders", fields: [userId], references: [id])
+  items         OrderItem[]
+  timeline      OrderTimeline[]
+  chatMessages  ChatMessage[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
+}
+
+model OrderTimeline {
+  id        String      @id @default(uuid())
+  orderId   String
+  status    OrderStatus
+  notes     String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id])
+}
+
+model CourierStatus {
+  id         String   @id @default(uuid())
+  courierId  String   @unique
+  isOnline   Boolean  @default(false)
+  lastLat    Float?
+  lastLng    Float?
+  lastUpdate DateTime @default(now())
+  courier    User     @relation(fields: [courierId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  resource  String
+  details   String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model OperatingDay {
+  id           String     @id @default(uuid())
+  restaurantId String
+  dayOfWeek    Int
+  enabled      Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@unique([restaurantId, dayOfWeek])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  orderId   String
+  userId    String
+  text      String
+  sender    String   // 'USER', 'RESTAURANT', 'COURIER', 'SYSTEM'
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Shift {
+  id           String     @id @default(uuid())
+  restaurantId String
+  name         String
+  startTime    String
+  endTime      String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  products     Product[]  @relation("ProductToShift")
+}
+
+enum UserRole {
+  CLIENT
+  RESTAURANT
+  COURIER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  PICKED_UP
+  DELIVERING
+  DELIVERED
+  CANCELLED
+}

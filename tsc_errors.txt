@@ -1,0 +1,8 @@
+.next/types/app/(courier)/run/[id]/page.ts(34,29): error TS2344: Type '{ params: { id: string; }; }' does not satisfy the constraint 'PageProps'.
+  Types of property 'params' are incompatible.
+    Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+app/api/courier/status/get_route_dummy.ts(2,16): error TS2307: Cannot find module '@/lib/db' or its corresponding type declarations.
+app/api/courier/status/route.ts(2,16): error TS2307: Cannot find module '@/lib/db' or its corresponding type declarations.
+lib/error-handler.ts(29,32): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+lib/error-handler.ts(29,43): error TS7006: Parameter 'e' implicitly has an 'any' type.
+middleware.ts(2,34): error TS2307: Cannot find module 'next/request' or its corresponding type declarations.

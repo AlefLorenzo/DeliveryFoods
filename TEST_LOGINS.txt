@@ -1,0 +1,17 @@
+LOGINS PARA TESTE - DELIVERY FOODS
+================================
+
+1. CLIENTE (Vista do Cliente)
+   Email: cliente@teste.com
+   Senha: password123 (Padrão de desenvolvimento)
+
+2. RESTAURANTE (Vista do Parceiro/Cozinha)
+   Email: rest@teste.com
+   Senha: password123
+
+3. ENTREGADOR (Vista do Courier/Feed)
+   Email: courier@teste.com
+   Senha: password123
+
+================================
+Nota: Todos os usuários usam a senha padrão 'password123' configurada no seed do banco de dados.

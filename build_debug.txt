@@ -1,0 +1,33 @@
+
+> delivery-system@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.4 (Turbopack)
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 2.4s
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/10) ...
+  Generating static pages using 15 workers (2/10) 
+  Generating static pages using 15 workers (4/10) 
+  Generating static pages using 15 workers (7/10) 
+Ô£ô Generating static pages using 15 workers (10/10) in 576.2ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ Ôùï /cart
+Ôö£ Ôùï /dashboard
+Ôö£ Ôùï /feed
+Ôö£ Ôùï /home
+Ôö£ Ôùï /kitchen
+Ôö£ Ôùï /orders
+Ôö£ ãÆ /restaurant/[id]
+Ôöö ãÆ /run/[id]
+
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

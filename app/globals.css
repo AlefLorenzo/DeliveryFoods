@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: oklch(0.98 0.01 247);
+    --foreground: oklch(0.2 0.02 247);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0.02 247);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0.02 247);
+    --primary: oklch(0.65 0.25 45);
+    /* Laranja Snap Brilhante */
+    --primary-foreground: oklch(0.99 0 0);
+    /* Texto Branco Off no Laranja */
+    --secondary: oklch(0.93 0.02 247);
+    --secondary-foreground: oklch(0.3 0.02 247);
+    --muted: oklch(0.95 0.02 247);
+    --muted-foreground: oklch(0.45 0.02 247);
+    --accent: oklch(0.93 0.02 247);
+    --accent-foreground: oklch(0.3 0.02 247);
+    --destructive: oklch(0.6 0.2 25);
+    --destructive-foreground: oklch(0.99 0 0);
+    --border: oklch(0.91 0.02 247);
+    --input: oklch(0.91 0.02 247);
+    --ring: oklch(0.65 0.25 45);
+    --radius: 1.25rem;
+  }
+
+  .dark {
+    --background: oklch(0.12 0.01 247);
+    --foreground: oklch(0.98 0 0);
+    --card: oklch(0.16 0.02 247);
+    --card-foreground: oklch(0.98 0 0);
+    --popover: oklch(0.14 0.02 247);
+    --popover-foreground: oklch(0.98 0 0);
+    --primary: oklch(0.7 0.2 50);
+    --primary-foreground: oklch(0.15 0.02 247);
+    /* Texto Escuro no Laranja em Dark Mode para contraste */
+    --secondary: oklch(0.22 0.02 247);
+    --secondary-foreground: oklch(0.95 0 0);
+    --muted: oklch(0.2 0.02 247);
+    --muted-foreground: oklch(0.6 0.02 247);
+    --accent: oklch(0.22 0.02 247);
+    --accent-foreground: oklch(0.95 0 0);
+    --destructive: oklch(0.45 0.2 25);
+    --destructive-foreground: oklch(0.98 0 0);
+    --border: oklch(0.22 0.02 247);
+    --input: oklch(0.22 0.02 247);
+    --ring: oklch(0.7 0.2 50);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100dvh;
+  }
+
+  html {
+    color-scheme: dark light;
+    background-color: var(--background);
+  }
+}
