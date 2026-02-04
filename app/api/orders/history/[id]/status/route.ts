@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { handleApiError, AppError } from '@/lib/error-handler';
 import { TokenService } from '@/lib/services/token.service';
 import { OrderService } from '@/lib/services/order.service';
+import { ChatTripartiteService } from '@/lib/services/chat-tripartite.service';
 import { OrderStatus } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
@@ -19,30 +20,39 @@ export async function PUT(
         if (!decoded) throw new AppError('Sessão expirada', 401);
 
         const { status, notes, courierId } = await request.json();
-
-        // 1. Validar transição (opcional, mas recomendado)
-        // 2. Se for Courier tentando aceitar, o status deve ser 'READY' -> 'PICKED_UP' (ou similar)
-
         const targetStatus = status as OrderStatus;
         const targetNotes = notes;
 
-        // Lógica Especial para Entregador aceitando pedido
-        /*
-        if (decoded.role === 'COURIER' && !status) {
-            targetStatus = 'PICKED_UP'; // Ou 'DELIVERING' dependendo do enum
-            targetNotes = 'Pedido coletado pelo entregador.';
-        }
-        */
+        const shouldSetCourier = courierId || (decoded.role === 'COURIER' && targetStatus === 'PICKED_UP');
 
-        const order = await OrderService.updateStatus(id, targetStatus, decoded.sub, targetNotes);
-
-        // Se o courierId foi passado (Aceite de corrida), atualizar o campo courierId explicitamente
-        if (courierId || (decoded.role === 'COURIER' && targetStatus === 'PICKED_UP')) {
+        if (shouldSetCourier) {
+            const assignedCourierId = courierId || decoded.sub;
             await prisma.order.update({
                 where: { id },
-                data: { courierId: courierId || decoded.sub }
+                data: { courierId: assignedCourierId }
             });
+            try {
+                const order = await prisma.order.findUnique({
+                    where: { id },
+                    include: { restaurant: { select: { ownerId: true } } }
+                });
+                if (order?.userId && order.restaurant?.ownerId) {
+                    const existingChannels = await prisma.chatChannel.findMany({
+                        where: { orderId: id, type: { in: ['CUSTOMER_COURIER', 'RESTAURANT_COURIER'] } }
+                    });
+                    if (!existingChannels.some(c => c.type === 'CUSTOMER_COURIER')) {
+                        await ChatTripartiteService.createCustomerCourierChannel(id, order.userId, assignedCourierId);
+                    }
+                    if (!existingChannels.some(c => c.type === 'RESTAURANT_COURIER')) {
+                        await ChatTripartiteService.createRestaurantCourierChannel(id, order.restaurant.ownerId, assignedCourierId);
+                    }
+                }
+            } catch (e) {
+                console.warn('[CHAT]: Falha ao criar canais entregador', e);
+            }
         }
+
+        const order = await OrderService.updateStatus(id, targetStatus, decoded.sub, targetNotes);
 
         return NextResponse.json(order);
 

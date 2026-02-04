@@ -1,27 +1,22 @@
 import { NextResponse } from 'next/server';
-import { ChatTripartiteService } from '@/lib/services/chat-tripartite.service';
+import { ChatTripartiteService, ChannelType } from '@/lib/services/chat-tripartite.service';
 import { TokenService } from '@/lib/services/token.service';
 import { handleApiError, AppError } from '@/lib/error-handler';
 
-type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER' | 'RESTAURANT_COURIER';
-
-// Rate limit: 10 mensagens/minuto por usuário (por canal)
-const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const CHAT_RATE_LIMIT = 10;
-const CHAT_RATE_WINDOW_MS = 60_000;
+const RATE_WINDOW_MS = 60_000;
+const chatRateMap = new Map<string, { count: number; resetAt: number }>();
 
-function checkChatRateLimit(userId: string, channelKey: string): void {
-    const key = `${userId}:${channelKey}`;
+function checkChatRateLimit(userId: string): void {
     const now = Date.now();
-    let data = chatRateLimitMap.get(key);
-    if (!data || now > data.resetAt) {
-        data = { count: 1, resetAt: now + CHAT_RATE_WINDOW_MS };
-        chatRateLimitMap.set(key, data);
-    } else {
-        data.count++;
+    let entry = chatRateMap.get(userId);
+    if (!entry || now >= entry.resetAt) {
+        entry = { count: 0, resetAt: now + RATE_WINDOW_MS };
+        chatRateMap.set(userId, entry);
     }
-    if (data.count > CHAT_RATE_LIMIT) {
-        throw new AppError(`Limite de ${CHAT_RATE_LIMIT} mensagens por minuto. Tente em instantes.`, 429);
+    entry.count++;
+    if (entry.count > CHAT_RATE_LIMIT) {
+        throw new AppError(`Limite de ${CHAT_RATE_LIMIT} mensagens por minuto. Tente em breve.`, 429);
     }
 }
 
@@ -72,12 +67,11 @@ export async function POST(
             throw new AppError('Mensagem vazia', 400);
         }
 
-        // Validação: Cliente-Entregador só aceita templates
+        checkChatRateLimit(decoded.sub as string);
+
         if (params.channelType === 'CUSTOMER_COURIER' && !isTemplate) {
             throw new AppError('Apenas mensagens prontas são permitidas neste canal', 400);
         }
-
-        checkChatRateLimit(decoded.sub as string, `${params.orderId}:${params.channelType}`);
 
         const message = await ChatTripartiteService.sendMessage({
             orderId: params.orderId,

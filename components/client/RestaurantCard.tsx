@@ -47,11 +47,18 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+<<<<<<< Current (Your changes)
                         {restaurant.isOpen && (
                             <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
                                 <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> ABERTO AGORA
                             </span>
                         )}
+=======
+                        <span className={`absolute top-2 right-2 z-10 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg ${restaurant.isOpen ? 'bg-green-500 text-white' : 'bg-red-600 text-white'}`}>
+                            {restaurant.isOpen ? 'Aberto agora' : 'Fechado'}
+                        </span>
+
+>>>>>>> Incoming (Background Agent changes)
                         {!restaurant.isOpen && restaurant.statusMessage && (
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-10">
                                 <span className="bg-red-600 text-white font-black uppercase text-xs px-4 py-2 rounded-full shadow-2xl tracking-widest border border-white/20">

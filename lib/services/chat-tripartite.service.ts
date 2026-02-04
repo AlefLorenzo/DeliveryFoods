@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { pusherServer, PUSHER_EVENTS } from '../pusher';
 import { AppError } from '@/lib/error-handler';
 
-type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER' | 'RESTAURANT_COURIER';
+type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER';
 
 interface SendMessageParams {
     orderId: string;
@@ -66,7 +66,6 @@ export class ChatTripartiteService {
             }
         });
 
-        // Mensagem automática
         await this.sendSystemMessage(channel.id,
             'Entregador atribuído ao seu pedido. Use as mensagens rápidas para comunicação.');
 
@@ -74,13 +73,12 @@ export class ChatTripartiteService {
     }
 
     /**
-     * Cria canal Restaurante-Entregador quando courier é atribuído (comunicação interna)
+     * Cria canal Restaurante-Entregador quando courier é atribuído (tripartite completo)
      */
     static async createRestaurantCourierChannel(orderId: string, restaurantOwnerId: string, courierId: string) {
         const order = await prisma.order.findUnique({
             where: { id: orderId }
         });
-
         if (!order) throw new AppError('Pedido não encontrado', 404);
 
         const channel = await prisma.chatChannel.create({
@@ -90,10 +88,8 @@ export class ChatTripartiteService {
                 participants: JSON.stringify([restaurantOwnerId, courierId])
             }
         });
-
         await this.sendSystemMessage(channel.id,
-            'Canal aberto entre restaurante e entregador para este pedido.');
-
+            'Canal restaurante-entregador aberto para coordenação da entrega.');
         return channel;
     }
 
@@ -124,12 +120,12 @@ export class ChatTripartiteService {
             throw new AppError('Você não tem permissão para enviar mensagens neste canal', 403);
         }
 
-        // 3. REGRA: Cliente-Entregador só aceita templates; Restaurante-Entregador livre
+        // 3. REGRA: Apenas canal Cliente-Entregador exige mensagens prontas (templates)
         if (channelType === 'CUSTOMER_COURIER' && !isTemplate) {
             throw new AppError('Apenas mensagens prontas são permitidas neste canal', 400);
         }
 
-        // 4. Criar mensagem
+        // 4. Criar mensagem (sender null quando for sistema)
         const message = await prisma.chatMessage.create({
             data: {
                 channelId: channel.id,
@@ -137,7 +133,7 @@ export class ChatTripartiteService {
                 text,
                 isTemplate,
                 templateId,
-                readBy: JSON.stringify([senderId]) // Sender já "leu"
+                readBy: JSON.stringify([senderId])
             },
             include: {
                 sender: {
@@ -260,18 +256,6 @@ export class ChatTripartiteService {
                 isTemplate: false,
                 readBy: JSON.stringify([])
             }
-        });
-    }
-
-    /**
-     * Retorna o canal para orderId + channelType (para rate limit / subscribe)
-     */
-    static async getChannelForOrderAndType(orderId: string, channelType: ChannelType) {
-        return prisma.chatChannel.findUnique({
-            where: {
-                orderId_type: { orderId, type: channelType }
-            },
-            select: { id: true }
         });
     }
 

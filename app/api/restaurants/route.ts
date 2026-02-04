@@ -29,9 +29,14 @@ export async function GET() {
                     isOpen: status.isOpen,
                     statusMessage: status.message,
                     currentShift: status.currentShift,
+<<<<<<< Current (Your changes)
                     nextOpen: status.nextOpen,
                     nextOpenMessage: status.nextOpenMessage,
                     tags: r.tags ? r.tags.split(',').map((t: string) => t.trim()) : ["Lanches", "Jantar"]
+=======
+                    nextOpen: status.nextOpen?.toISOString?.() ?? null,
+                    tags: (r as { tags?: string }).tags ? (r as { tags: string }).tags.split(',').map((t: string) => t.trim()) : ["Cardápio"]
+>>>>>>> Incoming (Background Agent changes)
                 };
             })
         );

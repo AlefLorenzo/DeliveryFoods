@@ -28,6 +28,10 @@ const CartPage = () => {
 
     const handleNextStep = () => {
         if (cart.items.length === 0) return;
+        if (!user?.address) {
+            addNotification("Cadastre seu endereço no perfil para continuar.", "error");
+            return;
+        }
         setStep('payment');
     };
 
@@ -162,12 +166,20 @@ const CartPage = () => {
                                         Endereço de Entrega
                                     </h3>
                                     <Link href="/profile">
-                                        <Button variant="ghost" className="text-primary font-black hover:bg-primary/5 rounded-xl">Alterar</Button>
+                                        <Button variant="ghost" className="text-primary font-black hover:bg-primary/5 rounded-xl">
+                                            {user?.address ? "Alterar" : "Cadastrar"}
+                                        </Button>
                                     </Link>
                                 </div>
                                 <div className="pl-13">
-                                    <p className="font-black text-foreground">{user?.address.street}, {user?.address.number}</p>
-                                    <p className="text-sm font-bold text-muted-foreground">{user?.address.neighborhood} • {user?.address.city}</p>
+                                    {user?.address ? (
+                                        <>
+                                            <p className="font-black text-foreground">{user.address.street}, {user.address.number}</p>
+                                            <p className="text-sm font-bold text-muted-foreground">{user.address.neighborhood} • {user.address.city}</p>
+                                        </>
+                                    ) : (
+                                        <p className="text-muted-foreground font-bold">Adicione seu endereço no perfil para continuar.</p>
+                                    )}
                                 </div>
                             </Card>
                         </div>

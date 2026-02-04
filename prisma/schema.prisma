@@ -55,14 +55,13 @@ model Restaurant {
   lat            Float?
   lng            Float?
   restaurantType RestaurantType @default(RESTAURANT) // RESTAURANT | LANCHONETE | MISTO
-  tags           String?        // comma-separated: "Lanches,Pizza,Jantar"
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   operatingDays  OperatingDay[]
-  orders         Order[]
-  products       Product[]
-  owner          User           @relation("RestaurantOwner", fields: [ownerId], references: [id])
-  shifts         Shift[]
+  orders        Order[]
+  products      Product[]
+  owner         User           @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  shifts        Shift[]
 }
 
 model Product {
@@ -74,7 +73,6 @@ model Product {
   category     String
   active       Boolean     @default(true)
   restaurantId String
-  isNew        Boolean     @default(true) // Badge "NOVO" por 24h
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   orderItems   OrderItem[]
@@ -181,6 +179,7 @@ model ChatMessage {
   text       String
   isTemplate Boolean     @default(false)
   templateId String?
+  imageUrl   String?     // upload de imagens no chat
   readBy     String      @default("[]")
   createdAt  DateTime    @default(now())
   channel    ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
@@ -247,7 +246,7 @@ enum OrderStatus {
 enum ChannelType {
   CUSTOMER_RESTAURANT
   CUSTOMER_COURIER
-  RESTAURANT_COURIER
+  RESTAURANT_COURIER  // restaurante ↔ entregador (tripartite completo)
 }
 
 enum RestaurantType {

@@ -23,7 +23,11 @@ export async function POST(request: Request) {
             validatedData.restaurantId,
             validatedData.items,
             validatedData.paymentMethod,
-            validatedData.discount || 0
+            validatedData.discount || 0,
+            {
+                needsChange: validatedData.needsChange,
+                changeFor: validatedData.changeFor,
+            }
         );
         console.log("Pedido criado com sucesso:", order.id);
 
