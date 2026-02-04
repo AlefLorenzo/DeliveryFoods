@@ -6,7 +6,11 @@ export interface Product {
     image: string;
     category: string;
     active: boolean;
+<<<<<<< Current (Your changes)
     isNew?: boolean;
+=======
+    /** Para badge "NOVO" nas últimas 24h */
+>>>>>>> Incoming (Background Agent changes)
     createdAt?: string;
 }
 

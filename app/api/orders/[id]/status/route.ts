@@ -27,6 +27,7 @@ export async function PUT(
         const targetNotes = notes;
         const newCourierId = courierId || (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus) ? decoded.sub : null);
 
+<<<<<<< Current (Your changes)
         const orderBefore = newCourierId ? await prisma.order.findUnique({
             where: { id },
             include: { restaurant: { select: { ownerId: true } } }
@@ -43,6 +44,34 @@ export async function PUT(
                     await ChatTripartiteService.createRestaurantCourierChannel(id, orderBefore.restaurant.ownerId, newCourierId);
                 } catch (e) {
                     console.warn('[CHAT] Falha ao criar canais do entregador', e);
+=======
+        const assignedCourierId = courierId || (decoded.role === 'COURIER' ? decoded.sub : null);
+        const shouldSetCourier = assignedCourierId &&
+            (courierId || (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus)));
+
+        if (shouldSetCourier) {
+            const before = await prisma.order.findUnique({
+                where: { id },
+                select: { courierId: true, userId: true, restaurantId: true }
+            });
+            await prisma.order.update({
+                where: { id },
+                data: { courierId: assignedCourierId }
+            });
+            // Criar canais de chat tripartite na primeira atribuição de entregador
+            if (before && !before.courierId && assignedCourierId) {
+                try {
+                    const rest = await prisma.restaurant.findUnique({
+                        where: { id: before.restaurantId },
+                        select: { ownerId: true }
+                    });
+                    if (rest) {
+                        await ChatTripartiteService.createCustomerCourierChannel(id, before.userId, assignedCourierId);
+                        await ChatTripartiteService.createRestaurantCourierChannel(id, rest.ownerId, assignedCourierId);
+                    }
+                } catch (e) {
+                    console.warn('[CHAT]: Falha ao criar canais Cliente-Entregador / Restaurante-Entregador', e);
+>>>>>>> Incoming (Background Agent changes)
                 }
             }
         }

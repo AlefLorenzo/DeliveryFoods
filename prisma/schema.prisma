@@ -42,27 +42,26 @@ model UserDetail {
 }
 
 model Restaurant {
-  id             String         @id @default(uuid())
-  name           String
-  description    String?
-  image          String?
-  ownerId        String
-  active         Boolean        @default(true)
-  rating         Float          @default(5.0)
-  deliveryFee    Float          @default(0)
-  minOrder       Float          @default(0)
-  avgTime        String?
-  lat            Float?
-  lng            Float?
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  image         String?
+  ownerId       String
   restaurantType RestaurantType @default(RESTAURANT) // RESTAURANT | LANCHONETE | MISTO
-  tags           String?        // comma-separated: "Lanches,Pizza,Jantar"
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  operatingDays  OperatingDay[]
-  orders         Order[]
-  products       Product[]
-  owner          User           @relation("RestaurantOwner", fields: [ownerId], references: [id])
-  shifts         Shift[]
+  active        Boolean        @default(true)
+  rating        Float          @default(5.0)
+  deliveryFee   Float          @default(0)
+  minOrder      Float          @default(0)
+  avgTime       String?
+  lat           Float?
+  lng           Float?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  operatingDays OperatingDay[]
+  orders        Order[]
+  products      Product[]
+  owner         User           @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  shifts        Shift[]
 }
 
 model Product {
@@ -74,7 +73,6 @@ model Product {
   category     String
   active       Boolean     @default(true)
   restaurantId String
-  isNew        Boolean     @default(true) // Badge "NOVO" por 24h
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   orderItems   OrderItem[]
@@ -179,9 +177,9 @@ model ChatMessage {
   channelId  String
   senderId   String?     // null = mensagem do sistema
   text       String
-  isTemplate Boolean     @default(false)
-  templateId String?
-  readBy     String      @default("[]")
+  isTemplate Boolean     @default(false) // true = mensagem pronta
+  templateId String?     // ID da mensagem pronta usada
+  readBy     String      @default("[]") // JSON array de userIds que leram
   createdAt  DateTime    @default(now())
   channel    ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   sender     User?       @relation(fields: [senderId], references: [id])

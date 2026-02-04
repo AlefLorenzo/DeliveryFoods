@@ -86,6 +86,7 @@ export class OrderService {
             // 3. Auditoria
             await AuditService.log(userId, 'CREATE_ORDER', 'Order', { orderId: order.id, total: order.total });
 
+<<<<<<< Current (Your changes)
             // 4. Canal de chat Cliente-Restaurante
             const rest = await prisma.restaurant.findUnique({ where: { id: order.restaurantId }, select: { ownerId: true } });
             if (rest) {
@@ -94,6 +95,14 @@ export class OrderService {
                 } catch (e) {
                     console.warn('[CHAT] Falha ao criar canal Cliente-Restaurante', e);
                 }
+=======
+            // 4. Canal de chat Cliente-Restaurante (tripartite)
+            try {
+                const rest = await prisma.restaurant.findUnique({ where: { id: order.restaurantId }, select: { ownerId: true } });
+                if (rest) await ChatTripartiteService.createCustomerRestaurantChannel(order.id, userId, rest.ownerId);
+            } catch (e) {
+                console.warn('[CHAT]: Falha ao criar canal Cliente-Restaurante', e);
+>>>>>>> Incoming (Background Agent changes)
             }
 
             // 5. Real-time Trigger via Pusher
