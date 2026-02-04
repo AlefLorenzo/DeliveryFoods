@@ -47,21 +47,31 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+                        {restaurant.isOpen && (
+                            <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                                <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> ABERTO AGORA
+                            </span>
+                        )}
                         {!restaurant.isOpen && restaurant.statusMessage && (
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-10">
                                 <span className="bg-red-600 text-white font-black uppercase text-xs px-4 py-2 rounded-full shadow-2xl tracking-widest border border-white/20">
-                                    {restaurant.statusMessage}
+                                    🔴 FECHADO
                                 </span>
+                                {restaurant.nextOpenMessage && (
+                                    <span className="absolute bottom-4 left-4 right-4 text-center text-white/90 text-[10px] font-bold">
+                                        {restaurant.nextOpenMessage}
+                                    </span>
+                                )}
                             </div>
                         )}
 
                         {restaurant.isOpen && restaurant.deliveryFee === 0 && (
-                            <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                            <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
                                 Entrega Grátis
                             </span>
                         )}
 
-                        {restaurant.isOpen && restaurant.statusMessage && restaurant.statusMessage !== "Open" && (
+                        {restaurant.isOpen && restaurant.statusMessage && !restaurant.statusMessage.startsWith("Aberto") && (
                             <span className="absolute bottom-2 right-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
                                 {restaurant.statusMessage}
                             </span>

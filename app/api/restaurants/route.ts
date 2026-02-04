@@ -12,21 +12,26 @@ export async function GET() {
             },
         });
 
+        const now = Date.now();
+        const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
+
         const results = await Promise.all(
             restaurants.map(async (r) => {
-                // Enforce types if needed, casting to any because of checkRestaurantStatus expecting specific shape if types aren't synced
-                // checkRestaurantStatus takes string ID. We should update it to take object if possible to save DB call?
-                // But checkRestaurantStatus currently does a findUnique. Inefficient for N restaurants. 
-                // Optimization: Refactor checkRestaurantStatus to accept the data object.
-                // For now, to be safe and use existing logic:
                 const status = await checkRestaurantStatus(r.id);
+                const products = (r.products as { id: string; name: string; description: string | null; price: number; image: string | null; category: string; active: boolean; isNew?: boolean; createdAt: Date }[]).map((p) => ({
+                    ...p,
+                    isNew: p.isNew ?? (new Date(p.createdAt).getTime() > twentyFourHoursAgo),
+                }));
 
                 return {
                     ...r,
+                    products,
                     isOpen: status.isOpen,
                     statusMessage: status.message,
                     currentShift: status.currentShift,
-                    tags: r.tags ? r.tags.split(',').map(t => t.trim()) : ["Lanches", "Jantar"]
+                    nextOpen: status.nextOpen,
+                    nextOpenMessage: status.nextOpenMessage,
+                    tags: r.tags ? r.tags.split(',').map((t: string) => t.trim()) : ["Lanches", "Jantar"]
                 };
             })
         );

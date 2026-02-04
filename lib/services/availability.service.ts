@@ -2,12 +2,13 @@ import prisma from "@/lib/prisma";
 
 export type RestaurantStatus = {
     isOpen: boolean;
-    message: string; // "Open for Lunch", "Closed", "Opens at 18:00"
+    message: string;
     currentShift?: {
         id: string;
         name: string;
     };
-    nextOpen?: Date;
+    nextOpen?: string; // HH:MM ou "Amanhã" para countdown
+    nextOpenMessage?: string; // "Abre às 18:00"
 };
 
 interface OperatingDay {
@@ -96,6 +97,5 @@ export async function checkRestaurantStatus(
         }
     }
 
-    // If no shifts but Open Today -> Open (Legacy fallback)
-    return { isOpen: true, message: "Open" };
+    return { isOpen: true, message: "Aberto" };
 }

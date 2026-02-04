@@ -36,6 +36,11 @@ export function ProductCard({ product, restaurant }: ProductCardProps) {
                 className="w-32 md:w-40 h-full object-cover transition-transform group-hover:scale-110"
             />
             <div className="flex-1 p-4 flex flex-col justify-between bg-card relative">
+                {(product.isNew ?? (product.createdAt && (Date.now() - new Date(product.createdAt).getTime() < 24 * 60 * 60 * 1000))) && (
+                    <span className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg animate-pulse">
+                        🔥 NOVO
+                    </span>
+                )}
                 <div>
                     <h3 className="font-bold text-foreground line-clamp-1">{product.name}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{product.description}</p>

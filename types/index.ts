@@ -6,6 +6,8 @@ export interface Product {
     image: string;
     category: string;
     active: boolean;
+    isNew?: boolean;
+    createdAt?: string;
 }
 
 export interface Restaurant {
@@ -13,14 +15,17 @@ export interface Restaurant {
     name: string;
     rating: number;
     avgTime?: string | null;
-    deliveryTime?: string; // Keep for legacy/compat if needed
+    deliveryTime?: string;
     deliveryFee: number;
     tags: string[];
     image: string;
     products: Product[];
     isOpen?: boolean;
     statusMessage?: string;
+    nextOpen?: string;
+    nextOpenMessage?: string;
     active: boolean;
+    restaurantType?: 'RESTAURANT' | 'LANCHONETE' | 'MISTO';
 }
 
 export interface Order {

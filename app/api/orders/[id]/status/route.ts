@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { handleApiError, AppError } from '@/lib/error-handler';
 import { TokenService } from '@/lib/services/token.service';
 import { OrderService } from '@/lib/services/order.service';
+import { ChatTripartiteService } from '@/lib/services/chat-tripartite.service';
 import { OrderStatus } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
@@ -24,16 +25,26 @@ export async function PUT(
 
         const targetStatus = status as OrderStatus;
         const targetNotes = notes;
+        const newCourierId = courierId || (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus) ? decoded.sub : null);
 
-        // Se o courierId foi passado ou se o usuário é COURIER aceitando/pegando o pedido
-        const shouldSetCourier = courierId ||
-            (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus));
+        const orderBefore = newCourierId ? await prisma.order.findUnique({
+            where: { id },
+            include: { restaurant: { select: { ownerId: true } } }
+        }) : null;
 
-        if (shouldSetCourier) {
+        if (newCourierId) {
             await prisma.order.update({
                 where: { id },
-                data: { courierId: courierId || decoded.sub }
+                data: { courierId: newCourierId }
             });
+            if (orderBefore && !orderBefore.courierId && orderBefore.restaurant?.ownerId) {
+                try {
+                    await ChatTripartiteService.createCustomerCourierChannel(id, orderBefore.userId, newCourierId);
+                    await ChatTripartiteService.createRestaurantCourierChannel(id, orderBefore.restaurant.ownerId, newCourierId);
+                } catch (e) {
+                    console.warn('[CHAT] Falha ao criar canais do entregador', e);
+                }
+            }
         }
 
         const order = await OrderService.updateStatus(id, targetStatus, decoded.sub, targetNotes);
