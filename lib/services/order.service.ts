@@ -83,10 +83,20 @@ export class OrderService {
             maxWait: 5000, // Tempo máximo para obter conexão
             timeout: 15000 // Tempo máximo da transação (15s)
         }).then(async (order) => {
-            // 3. Auditoria Industrial (fora da transação principal para performance)
+            // 3. Auditoria
             await AuditService.log(userId, 'CREATE_ORDER', 'Order', { orderId: order.id, total: order.total });
 
-            // 4. Real-time Trigger via Pusher
+            // 4. Canal de chat Cliente-Restaurante
+            const rest = await prisma.restaurant.findUnique({ where: { id: order.restaurantId }, select: { ownerId: true } });
+            if (rest) {
+                try {
+                    await ChatTripartiteService.createCustomerRestaurantChannel(order.id, userId, rest.ownerId);
+                } catch (e) {
+                    console.warn('[CHAT] Falha ao criar canal Cliente-Restaurante', e);
+                }
+            }
+
+            // 5. Real-time Trigger via Pusher
             try {
                 await pusherServer.trigger(`restaurant-${restaurantId}`, PUSHER_EVENTS.ORDER_CREATED, order);
                 await pusherServer.trigger(`user-${userId}`, PUSHER_EVENTS.ORDER_CREATED, order);

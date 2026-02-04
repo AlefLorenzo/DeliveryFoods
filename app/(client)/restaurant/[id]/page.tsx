@@ -1,15 +1,31 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ProductCard } from "@/components/client/ProductCard";
-import { Star, Clock, Loader2 } from "lucide-react";
+import { Star, Clock, Loader2, Sparkles } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { Restaurant } from "@/types";
+import { Restaurant, Product } from "@/types";
+import { Button } from "@/components/ui/button";
 
 export default function RestaurantPage() {
     const params = useParams();
     const router = useRouter();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [loading, setLoading] = useState(true);
+    const [onlyNew, setOnlyNew] = useState(false);
+
+    const sortedProducts = useMemo(() => {
+        if (!restaurant?.products) return [];
+        const list = [...restaurant.products] as Product[];
+        list.sort((a, b) => {
+            const aNew = a.isNew ?? (a.createdAt && (Date.now() - new Date(a.createdAt).getTime() < 24 * 60 * 60 * 1000));
+            const bNew = b.isNew ?? (b.createdAt && (Date.now() - new Date(b.createdAt).getTime() < 24 * 60 * 60 * 1000));
+            if (aNew && !bNew) return -1;
+            if (!aNew && bNew) return 1;
+            if (a.createdAt && b.createdAt) return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            return 0;
+        });
+        return onlyNew ? list.filter((p) => p.isNew ?? (p.createdAt && (Date.now() - new Date(p.createdAt).getTime() < 24 * 60 * 60 * 1000))) : list;
+    }, [restaurant?.products, onlyNew]);
 
     useEffect(() => {
         const fetchRestaurant = async () => {
@@ -79,9 +95,19 @@ export default function RestaurantPage() {
 
             {/* Cardápio / Produtos */}
             <div className="space-y-6">
-                <h2 className="text-3xl font-black text-foreground tracking-tighter">Cardápio</h2>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <h2 className="text-3xl font-black text-foreground tracking-tighter">Cardápio</h2>
+                    <Button
+                        variant={onlyNew ? "default" : "outline"}
+                        size="sm"
+                        className="rounded-xl gap-2 font-bold"
+                        onClick={() => setOnlyNew((v) => !v)}
+                    >
+                        <Sparkles className="w-4 h-4" /> Apenas novidades
+                    </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {restaurant.products.map((product) => (
+                    {sortedProducts.map((product) => (
                         <ProductCard
                             key={product.id}
                             product={product}
