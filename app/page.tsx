@@ -94,7 +94,7 @@ export default function Home() {
               </CardContent>
             </Card>
           </Link>
-
+          
           {/* Portal do Entregador */}
           <Link href="/login" onClick={() => localStorage.setItem('last_role', 'COURIER')} className="group">
             <Card className="h-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border-border bg-card rounded-[32px] overflow-hidden">
