@@ -26,8 +26,12 @@ export interface Restaurant {
     products: Product[];
     isOpen?: boolean;
     statusMessage?: string;
+<<<<<<< Current (Your changes)
     nextOpen?: string;
     nextOpenMessage?: string;
+=======
+    nextOpen?: string | null;
+>>>>>>> Incoming (Background Agent changes)
     active: boolean;
     restaurantType?: 'RESTAURANT' | 'LANCHONETE' | 'MISTO';
 }

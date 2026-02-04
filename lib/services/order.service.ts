@@ -7,8 +7,21 @@ import { pusherServer, PUSHER_EVENTS } from '../pusher';
 import { CourierEarningsService } from './courier-earnings.service';
 import { ChatTripartiteService } from './chat-tripartite.service';
 
+export interface CreateOrderOptions {
+    needsChange?: boolean;
+    changeFor?: number;
+}
+
 export class OrderService {
-    static async createOrder(userId: string, restaurantId: string, items: { productId: string; quantity: number }[], paymentMethod: string, discount: number = 0) {
+    static async createOrder(
+        userId: string,
+        restaurantId: string,
+        items: { productId: string; quantity: number }[],
+        paymentMethod: string,
+        discount: number = 0,
+        options: CreateOrderOptions = {}
+    ) {
+        const { needsChange = false, changeFor } = options;
 
         // 0. Validar Disponibilidade (Turno e Dia)
         const status = await checkRestaurantStatus(restaurantId);
@@ -68,6 +81,8 @@ export class OrderService {
                     discount,
                     paymentMethod,
                     status: 'PENDING',
+                    needsChange,
+                    changeFor: changeFor ?? null,
                     items: {
                         create: orderItemsData
                     },
@@ -75,7 +90,7 @@ export class OrderService {
                         create: { status: 'PENDING', notes: 'Pedido realizado pelo cliente.' }
                     }
                 },
-                include: { items: true, timeline: true }
+                include: { items: true, timeline: true, restaurant: { select: { ownerId: true } } }
             });
 
             return order;
@@ -86,6 +101,7 @@ export class OrderService {
             // 3. Auditoria
             await AuditService.log(userId, 'CREATE_ORDER', 'Order', { orderId: order.id, total: order.total });
 
+<<<<<<< Current (Your changes)
 <<<<<<< Current (Your changes)
             // 4. Canal de chat Cliente-Restaurante
             const rest = await prisma.restaurant.findUnique({ where: { id: order.restaurantId }, select: { ownerId: true } });
@@ -106,6 +122,19 @@ export class OrderService {
             }
 
             // 5. Real-time Trigger via Pusher
+=======
+            // 4. Canal de chat Cliente-Restaurante (tripartite)
+            try {
+                const ownerId = order.restaurant?.ownerId;
+                if (ownerId) {
+                    await ChatTripartiteService.createCustomerRestaurantChannel(order.id, userId, ownerId);
+                }
+            } catch (e) {
+                console.warn('[CHAT]: Falha ao criar canal cliente-restaurante', e);
+            }
+
+            // 5. Real-time via Pusher
+>>>>>>> Incoming (Background Agent changes)
             try {
                 await pusherServer.trigger(`restaurant-${restaurantId}`, PUSHER_EVENTS.ORDER_CREATED, order);
                 await pusherServer.trigger(`user-${userId}`, PUSHER_EVENTS.ORDER_CREATED, order);
@@ -113,7 +142,8 @@ export class OrderService {
                 console.warn('[PUSHER_ERROR]: Falha ao disparar evento em tempo real', e);
             }
 
-            return order;
+            const { restaurant: _r, ...orderWithoutRestaurant } = order;
+            return orderWithoutRestaurant;
         });
     }
 

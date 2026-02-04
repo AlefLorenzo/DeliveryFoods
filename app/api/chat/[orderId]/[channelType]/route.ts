@@ -1,29 +1,22 @@
 import { NextResponse } from 'next/server';
-import { ChatTripartiteService } from '@/lib/services/chat-tripartite.service';
+import { ChatTripartiteService, ChannelType } from '@/lib/services/chat-tripartite.service';
 import { TokenService } from '@/lib/services/token.service';
 import { handleApiError, AppError } from '@/lib/error-handler';
 
-type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER' | 'RESTAURANT_COURIER';
-
-// Rate limit: 10 mensagens/minuto por usuário (especificação)
-const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const CHAT_RATE_LIMIT = 10;
-const CHAT_RATE_WINDOW_MS = 60_000;
+const RATE_WINDOW_MS = 60_000;
+const chatRateMap = new Map<string, { count: number; resetAt: number }>();
 
 function checkChatRateLimit(userId: string): void {
     const now = Date.now();
-    const entry = chatRateLimitMap.get(userId);
-    if (!entry) {
-        chatRateLimitMap.set(userId, { count: 1, resetAt: now + CHAT_RATE_WINDOW_MS });
-        return;
-    }
-    if (now > entry.resetAt) {
-        chatRateLimitMap.set(userId, { count: 1, resetAt: now + CHAT_RATE_WINDOW_MS });
-        return;
+    let entry = chatRateMap.get(userId);
+    if (!entry || now >= entry.resetAt) {
+        entry = { count: 0, resetAt: now + RATE_WINDOW_MS };
+        chatRateMap.set(userId, entry);
     }
     entry.count++;
     if (entry.count > CHAT_RATE_LIMIT) {
-        throw new AppError(`Limite de mensagens atingido. Tente novamente em ${Math.ceil((entry.resetAt - now) / 1000)}s.`, 429);
+        throw new AppError(`Limite de ${CHAT_RATE_LIMIT} mensagens por minuto. Tente em breve.`, 429);
     }
 }
 
@@ -76,7 +69,6 @@ export async function POST(
 
         checkChatRateLimit(decoded.sub as string);
 
-        // Validação: Cliente-Entregador só aceita templates
         if (params.channelType === 'CUSTOMER_COURIER' && !isTemplate) {
             throw new AppError('Apenas mensagens prontas são permitidas neste canal', 400);
         }

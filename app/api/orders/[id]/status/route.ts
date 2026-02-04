@@ -21,58 +21,38 @@ export async function PUT(
 
         const body = await request.json();
         const { status, notes, courierId } = body;
-        console.log(`Recebendo atualização de status para pedido ${id}:`, body);
-
         const targetStatus = status as OrderStatus;
         const targetNotes = notes;
-        const newCourierId = courierId || (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus) ? decoded.sub : null);
 
-<<<<<<< Current (Your changes)
-        const orderBefore = newCourierId ? await prisma.order.findUnique({
-            where: { id },
-            include: { restaurant: { select: { ownerId: true } } }
-        }) : null;
-
-        if (newCourierId) {
-            await prisma.order.update({
-                where: { id },
-                data: { courierId: newCourierId }
-            });
-            if (orderBefore && !orderBefore.courierId && orderBefore.restaurant?.ownerId) {
-                try {
-                    await ChatTripartiteService.createCustomerCourierChannel(id, orderBefore.userId, newCourierId);
-                    await ChatTripartiteService.createRestaurantCourierChannel(id, orderBefore.restaurant.ownerId, newCourierId);
-                } catch (e) {
-                    console.warn('[CHAT] Falha ao criar canais do entregador', e);
-=======
-        const assignedCourierId = courierId || (decoded.role === 'COURIER' ? decoded.sub : null);
-        const shouldSetCourier = assignedCourierId &&
-            (courierId || (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus)));
+        const shouldSetCourier = courierId ||
+            (decoded.role === 'COURIER' && ['PICKED_UP', 'DELIVERING'].includes(targetStatus));
 
         if (shouldSetCourier) {
-            const before = await prisma.order.findUnique({
-                where: { id },
-                select: { courierId: true, userId: true, restaurantId: true }
-            });
+            const assignedCourierId = courierId || decoded.sub;
             await prisma.order.update({
                 where: { id },
                 data: { courierId: assignedCourierId }
             });
-            // Criar canais de chat tripartite na primeira atribuição de entregador
-            if (before && !before.courierId && assignedCourierId) {
-                try {
-                    const rest = await prisma.restaurant.findUnique({
-                        where: { id: before.restaurantId },
-                        select: { ownerId: true }
+
+            // Criar canais de chat Cliente-Entregador e Restaurante-Entregador (tripartite)
+            try {
+                const order = await prisma.order.findUnique({
+                    where: { id },
+                    include: { restaurant: { select: { ownerId: true } } }
+                });
+                if (order?.userId && order.restaurant?.ownerId) {
+                    const existingChannels = await prisma.chatChannel.findMany({
+                        where: { orderId: id, type: { in: ['CUSTOMER_COURIER', 'RESTAURANT_COURIER'] } }
                     });
-                    if (rest) {
-                        await ChatTripartiteService.createCustomerCourierChannel(id, before.userId, assignedCourierId);
-                        await ChatTripartiteService.createRestaurantCourierChannel(id, rest.ownerId, assignedCourierId);
+                    if (!existingChannels.some(c => c.type === 'CUSTOMER_COURIER')) {
+                        await ChatTripartiteService.createCustomerCourierChannel(id, order.userId, assignedCourierId);
                     }
-                } catch (e) {
-                    console.warn('[CHAT]: Falha ao criar canais Cliente-Entregador / Restaurante-Entregador', e);
->>>>>>> Incoming (Background Agent changes)
+                    if (!existingChannels.some(c => c.type === 'RESTAURANT_COURIER')) {
+                        await ChatTripartiteService.createRestaurantCourierChannel(id, order.restaurant.ownerId, assignedCourierId);
+                    }
                 }
+            } catch (e) {
+                console.warn('[CHAT]: Falha ao criar canais entregador', e);
             }
         }
 

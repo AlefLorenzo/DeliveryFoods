@@ -104,7 +104,10 @@ export async function checkRestaurantStatus(
                     isOpen: false,
                     message: `Fechado - Abre às ${nextShift.startTime} (${nextShift.name})`,
                     nextOpen,
+<<<<<<< Current (Your changes)
                     nextOpenAt: nextShift.startTime,
+=======
+>>>>>>> Incoming (Background Agent changes)
                 };
             } else {
                 return { isOpen: false, message: "Fechado por hoje" };

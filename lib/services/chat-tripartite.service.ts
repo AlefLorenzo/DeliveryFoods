@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { pusherServer, PUSHER_EVENTS } from '../pusher';
 import { AppError } from '@/lib/error-handler';
 
-type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER' | 'RESTAURANT_COURIER';
+type ChannelType = 'CUSTOMER_RESTAURANT' | 'CUSTOMER_COURIER';
 
 interface SendMessageParams {
     orderId: string;
@@ -66,10 +66,30 @@ export class ChatTripartiteService {
             }
         });
 
-        // Mensagem automática
         await this.sendSystemMessage(channel.id,
             'Entregador atribuído ao seu pedido. Use as mensagens rápidas para comunicação.');
 
+        return channel;
+    }
+
+    /**
+     * Cria canal Restaurante-Entregador quando courier é atribuído (tripartite completo)
+     */
+    static async createRestaurantCourierChannel(orderId: string, restaurantOwnerId: string, courierId: string) {
+        const order = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+        if (!order) throw new AppError('Pedido não encontrado', 404);
+
+        const channel = await prisma.chatChannel.create({
+            data: {
+                orderId,
+                type: 'RESTAURANT_COURIER',
+                participants: JSON.stringify([restaurantOwnerId, courierId])
+            }
+        });
+        await this.sendSystemMessage(channel.id,
+            'Canal restaurante-entregador aberto para coordenação da entrega.');
         return channel;
     }
 
@@ -100,12 +120,12 @@ export class ChatTripartiteService {
             throw new AppError('Você não tem permissão para enviar mensagens neste canal', 403);
         }
 
-        // 3. REGRA ESPECIAL: Cliente-Entregador só aceita templates (restaurante↔entregador aceita texto livre)
+        // 3. REGRA: Apenas canal Cliente-Entregador exige mensagens prontas (templates)
         if (channelType === 'CUSTOMER_COURIER' && !isTemplate) {
             throw new AppError('Apenas mensagens prontas são permitidas neste canal', 400);
         }
 
-        // 4. Criar mensagem
+        // 4. Criar mensagem (sender null quando for sistema)
         const message = await prisma.chatMessage.create({
             data: {
                 channelId: channel.id,
@@ -113,7 +133,7 @@ export class ChatTripartiteService {
                 text,
                 isTemplate,
                 templateId,
-                readBy: JSON.stringify([senderId]) // Sender já "leu"
+                readBy: JSON.stringify([senderId])
             },
             include: {
                 sender: {
@@ -225,7 +245,7 @@ export class ChatTripartiteService {
     }
 
     /**
-     * Mensagem automática do sistema (senderId null = sistema)
+     * Mensagem automática do sistema (senderId null)
      */
     private static async sendSystemMessage(channelId: string, text: string) {
         await prisma.chatMessage.create({
