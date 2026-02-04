@@ -4,6 +4,8 @@ import { AuditService } from './audit.service';
 import { AppError } from '@/lib/error-handler';
 import { checkRestaurantStatus } from './availability.service';
 import { pusherServer, PUSHER_EVENTS } from '../pusher';
+import { CourierEarningsService } from './courier-earnings.service';
+import { ChatTripartiteService } from './chat-tripartite.service';
 
 export class OrderService {
     static async createOrder(userId: string, restaurantId: string, items: { productId: string; quantity: number }[], paymentMethod: string, discount: number = 0) {
@@ -20,14 +22,14 @@ export class OrderService {
         const products = await prisma.product.findMany({
             where: { id: { in: productIds } },
             include: { shifts: true }
-        }) as any[];
+        });
 
         return await prisma.$transaction(async (tx) => {
             let subtotal = 0;
             const orderItemsData = [];
 
             for (const item of items) {
-                const product = products.find(p => p.id === item.productId) as any;
+                const product = products.find(p => p.id === item.productId);
                 if (!product || !product.active) throw new AppError(`Produto ${item.productId} indisponível`);
 
                 // Validação de Turno do Produto
@@ -72,7 +74,7 @@ export class OrderService {
                     timeline: {
                         create: { status: 'PENDING', notes: 'Pedido realizado pelo cliente.' }
                     }
-                } as any,
+                },
                 include: { items: true, timeline: true }
             });
 

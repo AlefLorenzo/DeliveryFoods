@@ -21,7 +21,7 @@ async function main() {
     console.log('🚀 Iniciando Seed Industrial...');
 
     // 2. Criar Usuários Base
-    const client = await prisma.user.create({
+    await prisma.user.create({
         data: {
             name: 'João Cliente Real',
             email: 'cliente@teste.com',
@@ -49,7 +49,7 @@ async function main() {
         }
     });
 
-    const courier = await prisma.user.create({
+    await prisma.user.create({
         data: {
             name: 'Carlos Entregador Pro',
             email: 'courier@teste.com',
@@ -62,7 +62,7 @@ async function main() {
     });
 
     // 3. Criar Restaurante e Produtos
-    const restaurant = await prisma.restaurant.create({
+    await prisma.restaurant.create({
         data: {
             name: 'Gourmet Burger Royale',
             description: 'Hambúrgueres artesanais premium com ingredientes selecionados.',

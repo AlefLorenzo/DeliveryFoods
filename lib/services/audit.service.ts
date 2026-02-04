@@ -1,7 +1,11 @@
 import prisma from '@/lib/prisma';
 
+interface AuditDetails {
+    [key: string]: unknown;
+}
+
 export class AuditService {
-    static async log(userId: string | null, action: string, resource: string, details?: any) {
+    static async log(userId: string | null, action: string, resource: string, details?: AuditDetails) {
         try {
             await prisma.auditLog.create({
                 data: {

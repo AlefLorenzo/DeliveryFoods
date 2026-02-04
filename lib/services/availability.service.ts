@@ -10,6 +10,18 @@ export type RestaurantStatus = {
     nextOpen?: Date;
 };
 
+interface OperatingDay {
+    dayOfWeek: number;
+    enabled: boolean;
+}
+
+interface Shift {
+    id: string;
+    name: string;
+    startTime: string;
+    endTime: string;
+}
+
 export async function checkRestaurantStatus(
     restaurantId: string
 ): Promise<RestaurantStatus> {
@@ -43,7 +55,7 @@ export async function checkRestaurantStatus(
     // (OR assume CLOSED if strict. Prompt said "mandatory config", but to avoid breaking existing, 
     // we might check if they have ANY operating days set. If count > 0, enforce it.)
     if (restaurant.operatingDays.length > 0) {
-        const todayConfig = restaurant.operatingDays.find((d: any) => d.dayOfWeek === dayOfWeek);
+        const todayConfig = restaurant.operatingDays.find((d: OperatingDay) => d.dayOfWeek === dayOfWeek);
         if (!todayConfig || !todayConfig.enabled) {
             return { isOpen: false, message: "Closed Today" };
         }
@@ -58,7 +70,7 @@ export async function checkRestaurantStatus(
     // If shifts exist, enforce them.
 
     if (restaurant.shifts.length > 0) {
-        const activeShift = restaurant.shifts.find((shift: any) => {
+        const activeShift = restaurant.shifts.find((shift: Shift) => {
             // Simple string comparison HH:MM works if time is same day. 
             // Does not support overnight shifts (23:00 - 02:00) easily without more logic.
             // Assuming intraday shifts for "Lunch/Dinner".

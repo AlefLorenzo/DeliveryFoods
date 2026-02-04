@@ -1,8 +1,7 @@
 import prisma from '@/lib/prisma';
-import { Restaurant, Product } from '@prisma/client';
 
 export class RestaurantService {
-    static async getNearby(lat: number, lng: number) {
+    static async getNearby() {
         // Em produção real, poderíamos usar extensões PostGIS
         return prisma.restaurant.findMany({
             where: { active: true },

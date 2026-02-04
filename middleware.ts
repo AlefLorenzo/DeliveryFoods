@@ -8,7 +8,7 @@ const RATE_LIMIT_THRESHOLD = 100; // 100 reqs por minuto
 const RESET_INTERVAL = 60000;
 
 export function middleware(request: NextRequest) {
-    const ip = request.headers.get('x-forwarded-for') || (request as any).ip || 'anonymous';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'anonymous';
     const now = Date.now();
 
     // 1. Rate Limiting Industrial

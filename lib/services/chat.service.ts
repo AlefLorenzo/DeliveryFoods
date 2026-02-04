@@ -2,6 +2,49 @@ import prisma from '@/lib/prisma';
 import { pusherServer, PUSHER_EVENTS } from '../pusher';
 import { AppError } from '@/lib/error-handler';
 
+// Definindo tipo para chatMessage já que não está no schema Prisma
+type PrismaWithChat = typeof prisma & {
+    chatMessage: {
+        create: (args: {
+            data: {
+                orderId: string;
+                userId: string;
+                text: string;
+                sender: string;
+            };
+            include?: {
+                user?: {
+                    select?: {
+                        name?: boolean;
+                        avatar?: boolean;
+                    };
+                };
+            };
+        }) => Promise<unknown>;
+        findMany: (args: {
+            where: { orderId: string };
+            include?: {
+                user?: {
+                    select?: {
+                        name?: boolean;
+                        avatar?: boolean;
+                    };
+                };
+            };
+            orderBy?: { createdAt: 'asc' | 'desc' };
+        }) => Promise<unknown[]>;
+        deleteMany: (args: {
+            where: {
+                createdAt: {
+                    lt: Date;
+                };
+            };
+        }) => Promise<{ count: number }>;
+    };
+};
+
+const prismaWithChat = prisma as PrismaWithChat;
+
 export class ChatService {
     static async sendMessage(orderId: string, userId: string, text: string, sender: string) {
         // Validar se o pedido existe
@@ -11,7 +54,7 @@ export class ChatService {
         if (!order) throw new AppError('Pedido não encontrado', 404);
 
         // Criar mensagem no banco
-        const message = await (prisma as any).chatMessage.create({
+        const message = await prismaWithChat.chatMessage.create({
             data: {
                 orderId,
                 userId,
@@ -35,7 +78,7 @@ export class ChatService {
         // Limpeza automática (mensagens somem após 24h)
         await this.cleanupOldMessages();
 
-        return await (prisma as any).chatMessage.findMany({
+        return await prismaWithChat.chatMessage.findMany({
             where: { orderId },
             include: { user: { select: { name: true, avatar: true } } },
             orderBy: { createdAt: 'asc' }
@@ -45,7 +88,7 @@ export class ChatService {
     private static async cleanupOldMessages() {
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         try {
-            await (prisma as any).chatMessage.deleteMany({
+            await prismaWithChat.chatMessage.deleteMany({
                 where: {
                     createdAt: {
                         lt: twentyFourHoursAgo

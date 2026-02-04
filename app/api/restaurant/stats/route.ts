@@ -10,9 +10,18 @@ export async function GET(request: Request) {
 
         const token = authHeader.split(' ')[1];
         const decoded = TokenService.verifyToken(token);
-        if (!decoded || decoded.role !== 'RESTAURANT') throw new AppError('Não autorizado', 401);
 
-        const stats = await RestaurantService.getStats(decoded.sub);
+        // Type narrowing: verificar se decoded não é null
+        if (!decoded) {
+            throw new AppError('Token inválido', 401);
+        }
+
+        // Agora TypeScript sabe que decoded não é null
+        if (decoded.role !== 'RESTAURANT') {
+            throw new AppError('Não autorizado', 401);
+        }
+
+        const stats = await RestaurantService.getStats(decoded.sub as string);
 
         if (!stats) {
             throw new AppError('Restaurante não encontrado para este usuário', 404);

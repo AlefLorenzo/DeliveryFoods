@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
 
-        let where: any = {};
+        const where: any = {};
 
         // Role-based filtering
         if (decoded.role === 'RESTAURANT') {

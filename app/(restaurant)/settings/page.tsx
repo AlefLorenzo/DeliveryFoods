@@ -2,14 +2,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Store, Clock, DollarSign } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { ShiftConfig } from "@/components/admin/ShiftConfig";
 
 export default function RestaurantSettings() {
-    const { user } = useAuthStore();
-    const [loading, setLoading] = useState(false);
     const [restaurantId, setRestaurantId] = useState<string | null>(null);
 
     useEffect(() => {

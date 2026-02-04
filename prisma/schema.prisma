@@ -8,21 +8,22 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  password      String
-  role          UserRole       @default(CLIENT)
-  avatar        String?
-  phone         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  auditLogs     AuditLog[]
-  courierStatus CourierStatus?
-  orders        Order[]        @relation("UserOrders")
-  ownedStores   Restaurant[]   @relation("RestaurantOwner")
-  details       UserDetail?
-  chatMessages  ChatMessage[]
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  password        String
+  role            UserRole          @default(CLIENT)
+  avatar          String?
+  phone           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  auditLogs       AuditLog[]
+  courierStatus   CourierStatus?
+  courierEarnings CourierEarnings[] @relation("CourierEarnings")
+  orders          Order[]           @relation("UserOrders")
+  ownedStores     Restaurant[]      @relation("RestaurantOwner")
+  details         UserDetail?
+  chatMessages    ChatMessage[]
 }
 
 model UserDetail {
@@ -99,7 +100,7 @@ model Order {
   user          User            @relation("UserOrders", fields: [userId], references: [id])
   items         OrderItem[]
   timeline      OrderTimeline[]
-  chatMessages  ChatMessage[]
+  chatChannels  ChatChannel[]
 }
 
 model OrderItem {
@@ -153,15 +154,61 @@ model OperatingDay {
   @@unique([restaurantId, dayOfWeek])
 }
 
+// ============================================
+// SISTEMA DE CHAT TRIPARTITE
+// ============================================
+
+model ChatChannel {
+  id           String        @id @default(uuid())
+  orderId      String
+  type         ChannelType // CUSTOMER_RESTAURANT, CUSTOMER_COURIER
+  participants String // JSON array de userIds permitidos
+  createdAt    DateTime      @default(now())
+  messages     ChatMessage[]
+  order        Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, type])
+  @@index([orderId])
+}
+
 model ChatMessage {
+  id         String      @id @default(uuid())
+  channelId  String
+  senderId   String
+  text       String
+  isTemplate Boolean     @default(false) // true = mensagem pronta
+  templateId String? // ID da mensagem pronta usada
+  readBy     String      @default("[]") // JSON array de userIds que leram
+  createdAt  DateTime    @default(now())
+  channel    ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender     User        @relation(fields: [senderId], references: [id])
+
+  @@index([channelId, createdAt])
+  @@index([senderId])
+}
+
+model QuickMessage {
   id        String   @id @default(uuid())
-  orderId   String
-  userId    String
-  text      String
-  sender    String   // 'USER', 'RESTAURANT', 'COURIER', 'SYSTEM'
+  text      String // "Já estou a caminho!", "Já cheguei!", "Não achei o endereço"
+  category  String // "COURIER_TO_CUSTOMER", "CUSTOMER_TO_COURIER"
+  icon      String? // Emoji ou ícone
+  order     Int      @default(0) // Ordem de exibição
   createdAt DateTime @default(now())
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+}
+
+// ============================================
+// SISTEMA DE GANHOS DO ENTREGADOR
+// ============================================
+
+model CourierEarnings {
+  id          String   @id @default(uuid())
+  courierId   String
+  orderId     String   @unique // Cada pedido gera apenas 1 registro de ganho
+  amount      Float // Valor ganho nesta entrega
+  confirmedAt DateTime @default(now()) // Quando cliente confirmou
+  courier     User     @relation("CourierEarnings", fields: [courierId], references: [id])
+
+  @@index([courierId, confirmedAt])
 }
 
 model Shift {
@@ -192,4 +239,9 @@ enum OrderStatus {
   DELIVERING
   DELIVERED
   CANCELLED
+}
+
+enum ChannelType {
+  CUSTOMER_RESTAURANT
+  CUSTOMER_COURIER
 }
