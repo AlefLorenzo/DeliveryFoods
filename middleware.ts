@@ -1,13 +1,26 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { TokenService } from './lib/services/token.service';
+import { jwtVerify } from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode(
+    process.env.JWT_SECRET || 'snap-secret-2026-industrial-v1'
+);
 
 // Simulação simples de Rate Limiting em memória (recomenda-se Redis para escala real)
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
 const RATE_LIMIT_THRESHOLD = 100; // 100 reqs por minuto
 const RESET_INTERVAL = 60000;
 
-export function middleware(request: NextRequest) {
+async function verifyToken(token: string) {
+    try {
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        return payload;
+    } catch {
+        return null;
+    }
+}
+
+export async function middleware(request: NextRequest) {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'anonymous';
     const now = Date.now();
 
@@ -32,7 +45,7 @@ export function middleware(request: NextRequest) {
         }
 
         const token = authHeader.split(' ')[1];
-        const decoded = TokenService.verifyToken(token);
+        const decoded = await verifyToken(token);
 
         if (!decoded) {
             return NextResponse.json({ error: 'Unauthorized - Invalid Token' }, { status: 401 });
