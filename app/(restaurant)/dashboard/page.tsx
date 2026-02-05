@@ -156,7 +156,7 @@ export default function RestaurantDashboard() {
                                 <p className="text-sm text-muted-foreground font-bold">Aguardando seu primeiro pedido de hoje...</p>
                             </div>
                         ) : (
-                            stats.recentOrders.map((order: any) => (
+                            stats.recentOrders.map((order) => (
                                 <div key={order.id} className="flex items-center justify-between p-6 hover:bg-muted/30 transition-colors group">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center font-black text-primary text-xs group-hover:scale-110 transition-transform">
@@ -165,7 +165,9 @@ export default function RestaurantDashboard() {
                                         <div>
                                             <p className="font-black text-foreground tracking-tight">{order.customer}</p>
                                             <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                                                {new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} • R${order.total.toFixed(2)}
+                                                {new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                {' '}
+                                                • R${order.total.toFixed(2)}
                                             </p>
                                         </div>
                                     </div>

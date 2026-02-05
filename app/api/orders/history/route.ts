@@ -12,7 +12,7 @@ export async function GET(request: Request) {
         const decoded = TokenService.verifyToken(token);
         if (!decoded) throw new AppError('Sessão expirada', 401);
 
-        let where: any = {};
+        let where = {};
         console.log(`Buscando histórico para: ${decoded.email} (${decoded.role}) ID: ${decoded.sub}`);
 
         if (decoded.role === 'CLIENT') {

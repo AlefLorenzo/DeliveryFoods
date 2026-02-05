@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useAuthStore, useAdminStore } from "@/lib/store";
+import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { RestaurantCard } from "@/components/client/RestaurantCard";
 
 export default function ProfilePage() {
     const { user, updateUser, favorites, coupons } = useAuthStore();
-    const { restaurants } = useAdminStore();
+
     const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'coupons'>('profile');
 
     const [formData, setFormData] = useState({
@@ -46,7 +46,22 @@ export default function ProfilePage() {
         setTimeout(() => setSaved(false), 3000);
     };
 
-    const favoriteRestaurants = restaurants.filter(r => favorites.includes(r.id));
+    const [favoriteRestaurants, setFavoriteRestaurants] = useState<Restaurant[]>([]);
+
+    useEffect(() => {
+        const fetchFavoriteRestaurants = async () => {
+            if (favorites.length > 0) {
+                try {
+                    const res = await fetch("/api/restaurants");
+                    const data: Restaurant[] = await res.json();
+                    setFavoriteRestaurants(data.filter(r => favorites.includes(r.id)));
+                } catch (error) {
+                    console.error("Erro ao buscar restaurantes favoritos:", error);
+                }
+            }
+        };
+        fetchFavoriteRestaurants();
+    }, [favorites]);
 
     return (
         <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20 transition-colors">

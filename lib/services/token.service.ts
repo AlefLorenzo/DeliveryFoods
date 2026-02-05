@@ -1,4 +1,5 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { AppError } from '@/lib/error-handler';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'snap-secret-2026-industrial-v1';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'snap-refresh-2026-industrial-v1';
@@ -22,27 +23,27 @@ export class TokenService {
 
     static verifyToken(token: string) {
         try {
-            return jwt.verify(token, JWT_SECRET) as any;
-        } catch (e) {
+            return jwt.verify(token, JWT_SECRET) as JwtPayload;
+        } catch {
             return null;
         }
     }
 
     static verifyRefreshToken(token: string) {
         try {
-            return jwt.verify(token, JWT_REFRESH_SECRET) as any;
-        } catch (e) {
+            return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
+        } catch {
             return null;
         }
     }
 
     static verifyAuthHeader(authHeader: string | null) {
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            throw new Error('Unauthorized');
+            throw new AppError("Unauthorized", 401);
         }
         const token = authHeader.split(' ')[1];
         const decoded = this.verifyToken(token);
-        if (!decoded) throw new Error('Invalid token');
+        if (!decoded) throw new AppError("Invalid token", 401);
         return decoded;
     }
 }

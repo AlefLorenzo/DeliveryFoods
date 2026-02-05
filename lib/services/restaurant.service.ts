@@ -1,8 +1,11 @@
 import prisma from '@/lib/prisma';
-import { Restaurant, Product } from '@prisma/client';
+import { Restaurant, Product, User, Order } from '@prisma/client';
+
+
+
 
 export class RestaurantService {
-    static async getNearby(lat: number, lng: number) {
+    static async getNearby(): Promise<(Restaurant & { owner: Pick<User, "name" | "avatar">; products: Product[]; })[]> {
         // Em produção real, poderíamos usar extensões PostGIS
         return prisma.restaurant.findMany({
             where: { active: true },
@@ -13,7 +16,7 @@ export class RestaurantService {
         });
     }
 
-    static async getById(id: string) {
+    static async getById(id: string): Promise<(Restaurant & { products: Product[]; owner: User; }) | null> {
         return prisma.restaurant.findUnique({
             where: { id },
             include: {
@@ -23,7 +26,13 @@ export class RestaurantService {
         });
     }
 
-    static async getStats(ownerId: string) {
+    static async getStats(ownerId: string): Promise<{
+        revenue: { daily: number; monthly: number; total: number; };
+        orders: { daily: number; total: number; };
+        averageTicket: number;
+        recentOrders: (Order & { user: Pick<User, "name">; })[];
+        chartData: { name: string; value: number; }[];
+    } | null> {
         const restaurant = await prisma.restaurant.findFirst({
             where: { ownerId }
         });

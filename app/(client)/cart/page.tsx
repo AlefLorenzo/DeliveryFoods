@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useCartStore, useAuthStore, useNotificationStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Trash2, Plus, ArrowRight, CreditCard, QrCode, Banknote, ShieldCheck, Loader2, MapPin, Ticket, Tag } from "lucide-react";
+import { Trash2, Plus, ArrowRight, CreditCard, QrCode, Banknote, ShieldCheck, Loader2, MapPin, Ticket, Tag, ShoppingBagIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -15,6 +16,7 @@ const CartPage = () => {
     const { addNotification } = useNotificationStore();
 
     const [step, setStep] = useState<'cart' | 'payment'>('cart');
+
     const [paymentMethod, setPaymentMethod] = useState<string>('credit');
     const [isProcessing, setIsProcessing] = useState(false);
     const [selectedCoupon, setSelectedCoupon] = useState<{ code: string, discount: number } | null>(null);
@@ -126,7 +128,7 @@ const CartPage = () => {
                                 {cart.items.map((item) => (
                                     <Card key={item.id} className="flex p-5 gap-6 overflow-hidden group border-none shadow-xl bg-card/40 backdrop-blur-md rounded-[32px] hover:scale-[1.01] transition-all">
                                         <div className="w-28 h-28 rounded-[24px] overflow-hidden">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                                            <Image src={item.image} alt={item.name} fill className="object-cover transition-transform group-hover:scale-110 duration-500" />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-between py-1">
                                             <div className="flex justify-between items-start">

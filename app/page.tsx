@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 import { useAuthStore } from "@/lib/store";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { UserRole } from "@/types";
 
 export default function Home() {
   const { user, isAuthenticated, hasHydrated } = useAuthStore();
-  const router = useRouter();
+
 
   useEffect(() => {
     if (hasHydrated && isAuthenticated && user?.role) {
@@ -26,22 +26,23 @@ export default function Home() {
     }
   }, [hasHydrated, isAuthenticated, user?.role]);
 
-  // Só mostra o loader se estiver de fato autenticado com uma role válida para redirecionar
-  if (hasHydrated && isAuthenticated && user?.role) {
+  if (!hasHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated && user?.role) {
     const paths: Record<UserRole, string> = {
       'CLIENT': '/home',
       'RESTAURANT': '/dashboard',
       'COURIER': '/feed'
     };
-    if (paths[user.role]) {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
-            <p className="text-muted-foreground font-bold animate-pulse">Redirecionando para seu portal...</p>
-          </div>
-        </div>
-      );
+    const targetPath = paths[user.role];
+    if (targetPath) {
+      window.location.href = targetPath;
     }
   }
 

@@ -1,5 +1,6 @@
 "use client";
 import { useState, use, useEffect, useCallback } from "react";
+import { Order } from "@/lib/store";
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, MessageSquare, CheckCircle, X } from "lucide-react";
@@ -10,7 +11,7 @@ export default function DeliveryRun({ params }: { params: Promise<{ id: string }
     const { id } = use(params);
     const router = useRouter();
     const { accessToken } = useAuthStore();
-    const [order, setOrder] = useState<any>(null);
+    const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [showChat, setShowChat] = useState(false);
 
@@ -20,7 +21,7 @@ export default function DeliveryRun({ params }: { params: Promise<{ id: string }
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
             const data = await res.json();
-            const found = data.find((o: any) => o.id === id);
+            const found = data.find((o: Order) => o.id === id);
             if (found) setOrder(found);
         } catch (err) {
             console.error("Erro ao carregar pedido:", err);
@@ -159,7 +160,7 @@ export default function DeliveryRun({ params }: { params: Promise<{ id: string }
                     <div className="bg-muted/30 p-5 rounded-2xl border border-border/50">
                         <h4 className="font-black text-xs uppercase tracking-widest mb-3 text-primary">Detalhes do Pedido</h4>
                         <ul className="text-sm text-foreground/80 font-bold space-y-2">
-                            {order.items?.map((item: any) => (
+                            {order.items?.map((item: { id: string; product?: { name: string }; quantity: number }) => (
                                 <li key={item.id} className="flex justify-between items-center bg-card/50 p-2 rounded-lg border border-border/50">
                                     <span>{item.product?.name || 'Item'}</span>
                                     <span className="bg-primary/10 text-primary px-3 py-1 rounded-xl text-xs font-black">{item.quantity}x</span>

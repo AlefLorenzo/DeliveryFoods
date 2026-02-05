@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'snap-secret-2026-industrial-v1';
@@ -32,7 +32,8 @@ export class AuthService {
 
     static verifyToken(token: string) {
         try {
-            return jwt.verify(token, JWT_SECRET) as any;
+            return jwt.verify(token, JWT_SECRET) as JwtPayload;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
             return null;
         }
@@ -40,7 +41,8 @@ export class AuthService {
 
     static verifyRefreshToken(token: string) {
         try {
-            return jwt.verify(token, JWT_REFRESH_SECRET) as any;
+            return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
             return null;
         }

@@ -21,6 +21,7 @@ export interface Restaurant {
     isOpen?: boolean;
     statusMessage?: string;
     active: boolean;
+    ownerId?: string;
 }
 
 export interface Order {

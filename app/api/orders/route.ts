@@ -46,7 +46,8 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
 
-        let where: any = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const where: any = {};
 
         // Role-based filtering
         if (decoded.role === 'RESTAURANT') {

@@ -65,9 +65,10 @@ export default function LoginPage() {
             const target = paths[apiUser.role] || '/';
             window.location.href = target;
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Erro no processo de login:", err);
-            alert(err.message || "Ocorreu um erro ao tentar entrar. Verifique suas credenciais.");
+            const message = err instanceof Error ? err.message : "Ocorreu um erro ao tentar entrar. Verifique suas credenciais.";
+            alert(message);
         } finally {
             setLoading(false);
         }

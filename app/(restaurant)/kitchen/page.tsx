@@ -4,12 +4,12 @@ import { useAuthStore, Order } from "@/lib/store";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, ChefHat, Bell, Package } from "lucide-react";
+import { Check, ChefHat, Bell } from "lucide-react";
 import { getPusherClient, PUSHER_EVENTS } from "@/lib/pusher";
 import { useNotificationStore } from "@/lib/store";
 
 export default function RestaurantOrders() {
-    const { accessToken } = useAuthStore();
+    const { accessToken, user } = useAuthStore();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -39,11 +39,33 @@ export default function RestaurantOrders() {
         }
     }, [accessToken, fetchOrders]);
 
-    useEffect(() => {
-        if (!accessToken || !orders.length) return;
+    const [restaurantId, setRestaurantId] = useState<string | null>(null);
 
-        // Get restaurantId from the first order or fetch it
-        const restaurantId = orders[0]?.restaurantId;
+    useEffect(() => {
+        if (!accessToken || !user?.id) return;
+
+        const fetchRestaurantId = async () => {
+            try {
+                const res = await fetch(`/api/restaurant/by-owner/${user.id}`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const data = await res.json();
+                if (res.ok && data?.id) {
+                    setRestaurantId(data.id);
+                } else {
+                    console.error("Could not fetch restaurant ID for user:", user.id);
+                    setRestaurantId(null);
+                }
+            } catch (err) {
+                console.error("Error fetching restaurant ID:", err);
+                setRestaurantId(null);
+            }
+        };
+
+        fetchRestaurantId();
+    }, [accessToken, user?.id]);
+
+    useEffect(() => {
         if (!restaurantId) return;
 
         const pusher = getPusherClient();
@@ -54,7 +76,6 @@ export default function RestaurantOrders() {
         channel.bind(PUSHER_EVENTS.ORDER_CREATED, (newOrder: Order) => {
             setOrders(prev => [newOrder, ...prev]);
             useNotificationStore.getState().addNotification(`Novo pedido recebido! #${newOrder.id.slice(0, 6)}`, 'info');
-            // Play a sound could be added here
         });
 
         channel.bind(PUSHER_EVENTS.ORDER_STATUS_UPDATED, (updatedOrder: Order) => {
@@ -64,7 +85,7 @@ export default function RestaurantOrders() {
         return () => {
             pusher.unsubscribe(`restaurant-${restaurantId}`);
         };
-    }, [accessToken, orders]); // Dependency on orders to get the ID, but we should ideally fetch it once
+    }, [restaurantId]);
 
     const updateStatus = async (orderId: string, status: string) => {
         try {
@@ -168,12 +189,12 @@ function OrderCard({ order, actionLabel, onAction, variant }: { order: Order, ac
     return (
         <Card className="animate-in fade-in slide-in-from-bottom-2 duration-300 bg-card">
             <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-                <span className="font-bold text-foreground">Pedido #{(order as any).orderNumber || order.id.slice(0, 8)}</span>
+                <span className="font-bold text-foreground">Pedido #{order.id.slice(0, 8)}</span>
                 <span className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </CardHeader>
             <CardContent className="p-4 pt-2">
                 <div className="space-y-1 mb-4">
-                    {order.items?.map((item: any) => (
+                    {order.items?.map((item: { id: string; quantity: number; product?: { name: string } }) => (
                         <div key={item.id} className="text-sm flex justify-between text-foreground/80">
                             <span>{item.quantity}x {item.product?.name || 'Item'}</span>
                         </div>

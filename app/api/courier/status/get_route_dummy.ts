@@ -14,7 +14,7 @@ export async function GET(request: Request) {
             where: { courierId }
         });
         return NextResponse.json({ isOnline: status ? !!status.isOnline : false });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Erro ao buscar status' }, { status: 500 });
     }
 }

@@ -26,7 +26,7 @@ export async function GET() {
             restaurants,
             users
         });
-    } catch (error: any) {
+    } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

@@ -7,10 +7,10 @@ import prisma from '@/lib/prisma';
 
 export async function PUT(
     request: Request,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: { id: string } }
 ) {
     try {
-        const { id } = await params;
+        const { id } = params;
         const authHeader = request.headers.get('authorization');
         if (!authHeader) throw new AppError('Não autorizado', 401);
 

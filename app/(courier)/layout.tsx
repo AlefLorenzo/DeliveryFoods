@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Bike, User, Map, History, LogOut, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
-import { useRouter } from "next/navigation";
+
 
 export default function CourierLayout({
     children,
@@ -11,7 +11,7 @@ export default function CourierLayout({
     children: React.ReactNode;
 }) {
     const { user, isAuthenticated, hasHydrated, logout } = useAuthStore();
-    const router = useRouter();
+
     const [isOnline, setIsOnline] = useState(false);
 
     useEffect(() => {

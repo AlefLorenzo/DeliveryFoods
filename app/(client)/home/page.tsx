@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOrderStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 import Link from "next/link";
 
 const HERO_IMAGES = [
@@ -96,7 +97,7 @@ export default function ClientHome() {
                         className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
                     >
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70 z-10" />
-                        <img src={img} alt="Delivery Hero" className="w-full h-full object-cover scale-105" />
+                        <Image src={img} alt="Delivery Hero" fill className="object-cover scale-105" />
                     </div>
                 ))}
 

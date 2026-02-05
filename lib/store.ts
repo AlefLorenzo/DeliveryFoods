@@ -32,13 +32,13 @@ export interface Order {
     restaurantId: string;
     restaurantName: string;
     restaurant?: { name: string; image: string; deliveryFee?: number };
-    user?: { name: string; phone: string; details?: any };
+    user?: { name: string; phone: string; details?: Record<string, unknown> };
     createdAt: string;
 }
 
 interface OrderState {
     orders: Order[];
-    placeOrder: (cart: { items: CartItem[], totalPrice: () => number, restaurant: Restaurant | null, clearCart: () => void }) => string;
+    placeOrder: (cart: { items: CartItem[], totalPrice: () => number, restaurant: Restaurant | null, clearCart: () => void }, discount?: number) => string;
     updateOrderStatus: (orderId: string, status: Order['status']) => void;
 }
 

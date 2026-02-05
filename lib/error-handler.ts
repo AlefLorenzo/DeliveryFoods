@@ -26,7 +26,7 @@ export function handleApiError(error: unknown) {
         return NextResponse.json(
             {
                 error: 'Erro de validação de dados',
-                details: ((error as any).errors || (error as any).issues || []).map((e: any) => ({ path: e.path, message: e.message }))
+                details: error.issues.map(issue => ({ path: issue.path, message: issue.message }))
             },
             { status: 422 }
         );

@@ -14,7 +14,7 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
-        const { id } = await params;
+        const { id } = params;
         const messages = await ChatService.getMessages(id);
         return NextResponse.json(messages);
     } catch (error) {
@@ -27,7 +27,7 @@ export async function POST(
     { params }: { params: { id: string } }
 ) {
     try {
-        const { id } = await params;
+        const { id } = params;
         const authHeader = req.headers.get('Authorization');
         const decoded = TokenService.verifyAuthHeader(authHeader);
 

@@ -1,17 +1,42 @@
 "use client";
 import { useState } from "react";
-import { useAdminStore } from "@/lib/store";
+import Image from "next/image";
+import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Plus, Edit, Trash2, X, Check } from "lucide-react";
-import { Product } from "@/types";
+import { Product, Restaurant } from "@/types";
 
 export default function MenuManager() {
-    const { restaurants, addProduct, updateProduct, deleteProduct } = useAdminStore();
-    // Para simplificar no demo, pegamos o primeiro restaurante
-    const restaurant = restaurants[0];
+    const { user, accessToken } = useAuthStore();
+    const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+    const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        if (!accessToken || !user?.id) return;
+
+        const fetchRestaurant = async () => {
+            try {
+                const res = await fetch(`/api/restaurant/by-owner/${user.id}`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const data = await res.json();
+                if (res.ok && data) {
+                    setRestaurant(data);
+                } else {
+                    console.error("Could not fetch restaurant for user:", user.id);
+                }
+            } catch (err) {
+                console.error("Error fetching restaurant:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRestaurant();
+    }, [accessToken, user?.id]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Partial<Product>>({
         name: "",
@@ -21,21 +46,39 @@ export default function MenuManager() {
         image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     });
 
-    const handleSave = () => {
-        if (!formData.name || !formData.price) return;
+    const handleSave = async () => {
+        if (!formData.name || !formData.price || !restaurant?.id) return;
 
-        if (editingId) {
-            updateProduct(restaurant.id, { ...formData, id: editingId } as Product);
-            setEditingId(null);
-        } else {
-            const newProduct = {
-                ...formData,
-                id: Math.random().toString(36).substr(2, 9)
-            } as Product;
-            addProduct(restaurant.id, newProduct);
-            setIsAdding(false);
+        const productData = { ...formData, restaurantId: restaurant.id };
+
+        try {
+            let res;
+            if (editingId) {
+                res = await fetch(`/api/products/${editingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+                    body: JSON.stringify(productData)
+                });
+            } else {
+                res = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+                    body: JSON.stringify(productData)
+                });
+            }
+
+            if (res.ok) {
+                const updatedRestaurant = await res.json();
+                setRestaurant(updatedRestaurant);
+                setIsAdding(false);
+                setEditingId(null);
+                setFormData({ name: "", description: "", price: 0, category: "", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80" });
+            } else {
+                console.error("Failed to save product");
+            }
+        } catch (error) {
+            console.error("Error saving product:", error);
         }
-        setFormData({ name: "", description: "", price: 0, category: "", image: formData.image });
     };
 
     const startEdit = (p: Product) => {
@@ -43,6 +86,33 @@ export default function MenuManager() {
         setEditingId(p.id);
         setIsAdding(true);
     };
+
+    const handleDelete = async (productId: string) => {
+        if (!restaurant?.id) return;
+        try {
+            const res = await fetch(`/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            if (res.ok) {
+                const updatedRestaurant = await res.json();
+                setRestaurant(updatedRestaurant);
+            } else {
+                console.error("Failed to delete product");
+            }
+        } catch (error) {
+            console.error("Error deleting product:", error);
+        }
+    };
+
+    if (loading) return (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            <p className="text-muted-foreground font-black animate-pulse uppercase tracking-widest text-xs">Carregando Cardápio...</p>
+        </div>
+    );
+
+    if (!restaurant) return <div className="p-10 text-center font-bold text-muted-foreground">Nenhum restaurante encontrado para este usuário.</div>;
 
     return (
         <div className="space-y-8">
@@ -102,7 +172,7 @@ export default function MenuManager() {
                     <Card key={product.id} className="overflow-hidden bg-card border-border shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-300 rounded-[28px] group">
                         <div className="flex items-center p-4 gap-6">
                             <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-                                <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} />
+                                <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
                             </div>
                             <div className="flex-1">
@@ -119,7 +189,7 @@ export default function MenuManager() {
                                 <Button variant="ghost" size="icon" onClick={() => startEdit(product)} className="w-11 h-11 rounded-xl bg-muted/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all">
                                     <Edit className="w-5 h-5" />
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => deleteProduct(restaurant.id, product.id)} className="w-11 h-11 rounded-xl bg-muted/50 text-red-500 hover:bg-red-500/10 hover:text-red-600 transition-all">
+                                <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="w-11 h-11 rounded-xl bg-muted/50 text-red-500 hover:bg-red-500/10 hover:text-red-600 transition-all">
                                     <Trash2 className="w-5 h-5" />
                                 </Button>
                             </div>

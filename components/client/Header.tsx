@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ShoppingBag, MapPin, Loader2, LogOut, Settings, History, Home, Moon, Sun } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCartStore, useAuthStore, useThemeStore } from "@/lib/store";
 import {
@@ -79,7 +80,8 @@ export function ClientHeader() {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="flex items-center gap-3 h-14 pl-2 pr-4 rounded-full hover:bg-muted/50 transition-all border-2 border-transparent hover:border-primary/20 bg-background shadow-sm overflow-hidden">
                                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 shadow-inner">
-                                    <img src={user?.avatar} alt={user?.name} className="w-full h-full object-cover" />
+                                    <Image src={user?.avatar || 
+'/placeholder-avatar.png'} alt={user?.name || 'User Avatar'} fill className="object-cover" />
                                 </div>
                                 <div className="hidden md:flex flex-col items-start leading-tight">
                                     <span className="text-sm font-black text-foreground">{user?.name}</span>
@@ -91,7 +93,8 @@ export function ClientHeader() {
                             <DropdownMenuLabel className="p-4 bg-muted/50 rounded-[24px] mb-2 border border-border/30">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary shadow-lg ring-4 ring-primary/10">
-                                        <img src={user?.avatar} alt={user?.name} className="w-full h-full object-cover" />
+                                        <Image src={user?.avatar || 
+'/placeholder-avatar.png'} alt={user?.name || 'User Avatar'} fill className="object-cover" />
                                     </div>
                                     <div className="flex-1 overflow-hidden">
                                         <p className="font-black text-foreground truncate text-lg tracking-tight">{user?.name}</p>

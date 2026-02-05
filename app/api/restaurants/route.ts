@@ -26,14 +26,12 @@ export async function GET() {
                     isOpen: status.isOpen,
                     statusMessage: status.message,
                     currentShift: status.currentShift,
-                    tags: r.tags ? r.tags.split(',').map(t => t.trim()) : ["Lanches", "Jantar"]
                 };
             })
         );
 
         return NextResponse.json(results);
-    } catch (error) {
-        console.error("Error listing restaurants:", error);
+    } catch (error) {   console.error("Error listing restaurants:", error);
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }

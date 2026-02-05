@@ -11,7 +11,7 @@ export class ChatService {
         if (!order) throw new AppError('Pedido não encontrado', 404);
 
         // Criar mensagem no banco
-        const message = await (prisma as any).chatMessage.create({
+        const message = await prisma.chatMessage.create({
             data: {
                 orderId,
                 userId,
@@ -24,8 +24,8 @@ export class ChatService {
         // Trigger em tempo real via Pusher
         try {
             await pusherServer.trigger(`order-${orderId}`, PUSHER_EVENTS.CHAT_MESSAGE, message);
-        } catch (e) {
-            console.warn('[PUSHER_ERROR]: Falha ao disparar mensagem de chat', e);
+        } catch (_e) {
+            console.warn("[PUSHER_ERROR]: Falha ao disparar mensagem de chat", _e);
         }
 
         return message;
@@ -35,7 +35,7 @@ export class ChatService {
         // Limpeza automática (mensagens somem após 24h)
         await this.cleanupOldMessages();
 
-        return await (prisma as any).chatMessage.findMany({
+        return await prisma.chatMessage.findMany({
             where: { orderId },
             include: { user: { select: { name: true, avatar: true } } },
             orderBy: { createdAt: 'asc' }
@@ -45,15 +45,15 @@ export class ChatService {
     private static async cleanupOldMessages() {
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         try {
-            await (prisma as any).chatMessage.deleteMany({
+            await prisma.chatMessage.deleteMany({
                 where: {
                     createdAt: {
                         lt: twentyFourHoursAgo
                     }
                 }
             });
-        } catch (e) {
-            console.error('[CLEANUP_ERROR]: Falha ao limpar mensagens antigas', e);
+        } catch (_e) {
+            console.error("[CLEANUP_ERROR]: Falha ao limpar mensagens antigas", _e);
         }
     }
 }
