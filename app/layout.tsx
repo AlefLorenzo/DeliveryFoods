@@ -16,8 +16,14 @@ export const metadata: Metadata = {
   title: "Delivery Foods | Pedidos em tempo real",
   description: "Peça delivery com acompanhamento em tempo real, chat com restaurante e entregador.",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#ea580c",
-  viewport: { width: "device-width", initialScale: 1, maximumScale: 1, userScalable: false },
 };
 
 import { ThemeWrapper } from "@/components/ThemeWrapper";

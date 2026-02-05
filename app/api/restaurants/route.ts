@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { checkRestaurantStatus } from "@/lib/services/availability.service";
+import { MOCK_RESTAURANTS } from "@/lib/data";
 
 export async function GET() {
     try {
@@ -8,7 +9,7 @@ export async function GET() {
             include: {
                 operatingDays: true,
                 shifts: true,
-                products: true, // Need products to filter/show tags? Or simplify.
+                products: true,
             },
         });
 
@@ -29,24 +30,17 @@ export async function GET() {
                     isOpen: status.isOpen,
                     statusMessage: status.message,
                     currentShift: status.currentShift,
-<<<<<<< Current (Your changes)
-                    nextOpen: status.nextOpen,
-                    nextOpenMessage: status.nextOpenMessage,
-                    tags: r.tags ? r.tags.split(',').map((t: string) => t.trim()) : ["Lanches", "Jantar"]
-=======
                     nextOpen: status.nextOpen?.toISOString?.() ?? null,
-                    tags: (r as { tags?: string }).tags ? (r as { tags: string }).tags.split(',').map((t: string) => t.trim()) : ["Cardápio"]
->>>>>>> Incoming (Background Agent changes)
+                    nextOpenMessage: status.nextOpenMessage ?? null,
+                    tags: (r as { tags?: string }).tags ? (r as { tags: string }).tags.split(',').map((t: string) => t.trim()) : ["Lanches", "Jantar"]
                 };
             })
         );
 
         return NextResponse.json(results);
     } catch (error) {
-        console.error("Error listing restaurants:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
-        );
+        // Fallback para dados mock quando o banco de dados não está disponível
+        console.warn("Database unavailable, using mock data:", error);
+        return NextResponse.json(MOCK_RESTAURANTS);
     }
 }

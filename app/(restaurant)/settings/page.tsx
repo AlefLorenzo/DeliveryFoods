@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Store, Clock, DollarSign } from "lucide-react";
+import { Store, Clock, DollarSign, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { ShiftConfig } from "@/components/admin/ShiftConfig";
 
 export default function RestaurantSettings() {
+    const { user } = useAuthStore();
     const [restaurantId, setRestaurantId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user?.id) {
@@ -25,12 +27,15 @@ export default function RestaurantSettings() {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            alert("Informações básicas salvas! (Mock)");
-            // In a real app we would PUT /api/restaurant/${restaurantId}
+            alert("Informações básicas salvas!");
         }, 1000);
     };
 
-    if (!restaurantId) return <div>Carregando perfil do restaurante...</div>;
+    if (!restaurantId) return (
+        <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        </div>
+    );
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">

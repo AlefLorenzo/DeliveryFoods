@@ -67,7 +67,7 @@ export default function Home() {
                   <Utensils className="w-10 h-10 text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors" />
                 </div>
                 <CardTitle className="text-3xl font-black tracking-tighter">Sou Cliente</CardTitle>
-                <CardDescription className="text-muted-foreground font-bold mt-2 font-geist">Peça os melhores pratos da cidade.</CardDescription>
+                <CardDescription className="text-muted-foreground font-bold mt-2">Peça os melhores pratos da cidade.</CardDescription>
               </CardHeader>
               <CardContent className="pb-8">
                 <div className="flex items-center justify-center text-blue-600 dark:text-blue-400 font-black uppercase text-xs tracking-widest mt-4">

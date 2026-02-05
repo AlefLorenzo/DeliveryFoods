@@ -109,11 +109,9 @@ export function SharedChat({ orderId }: { orderId: string }) {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = async () => {
-        const text = input.trim();
-        if (!text || !accessToken || !user || !activeChannel) return;
+    const sendMessage = async (text: string, isTemplate: boolean = false, templateId?: string) => {
+        if (!text.trim() || !accessToken || !user || !activeChannel) return;
 
-        setInput("");
         setSending(true);
 
         try {
@@ -125,8 +123,8 @@ export function SharedChat({ orderId }: { orderId: string }) {
                 },
                 body: JSON.stringify({
                     text,
-                    isTemplate: activeChannel.type === "CUSTOMER_COURIER",
-                    templateId: undefined,
+                    isTemplate,
+                    templateId,
                 }),
             });
 
@@ -134,17 +132,22 @@ export function SharedChat({ orderId }: { orderId: string }) {
             if (res.ok && data.id) {
                 setMessages((prev) => [...prev, data]);
             } else {
-                setInput(text);
                 if (res.status === 429) {
                     alert(data.message || "Limite de mensagens por minuto. Aguarde um pouco.");
                 }
             }
         } catch (err) {
-            setInput(text);
             console.error("Erro ao enviar mensagem:", err);
         } finally {
             setSending(false);
         }
+    };
+
+    const handleSend = async () => {
+        const text = input.trim();
+        if (!text) return;
+        setInput("");
+        await sendMessage(text, activeChannelType === "CUSTOMER_COURIER");
     };
 
     const isCustomerCourier = activeChannelType === "CUSTOMER_COURIER";

@@ -6,11 +6,7 @@ export interface Product {
     image: string;
     category: string;
     active: boolean;
-<<<<<<< Current (Your changes)
     isNew?: boolean;
-=======
-    /** Para badge "NOVO" nas últimas 24h */
->>>>>>> Incoming (Background Agent changes)
     createdAt?: string;
 }
 
@@ -26,12 +22,8 @@ export interface Restaurant {
     products: Product[];
     isOpen?: boolean;
     statusMessage?: string;
-<<<<<<< Current (Your changes)
-    nextOpen?: string;
-    nextOpenMessage?: string;
-=======
     nextOpen?: string | null;
->>>>>>> Incoming (Background Agent changes)
+    nextOpenMessage?: string;
     active: boolean;
     restaurantType?: 'RESTAURANT' | 'LANCHONETE' | 'MISTO';
 }

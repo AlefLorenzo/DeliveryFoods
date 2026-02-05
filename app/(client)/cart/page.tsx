@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCartStore, useAuthStore, useNotificationStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Trash2, Plus, ArrowRight, CreditCard, QrCode, Banknote, ShieldCheck, Loader2, MapPin, Ticket, Tag } from "lucide-react";
+import { Trash2, Plus, ArrowRight, CreditCard, QrCode, Banknote, ShieldCheck, Loader2, MapPin, Ticket, Tag, ShoppingBag as ShoppingBagIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

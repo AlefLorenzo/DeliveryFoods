@@ -7,15 +7,9 @@ export type RestaurantStatus = {
         id: string;
         name: string;
     };
-<<<<<<< Current (Your changes)
-    nextOpen?: string; // HH:MM ou "Amanhã" para countdown
-    nextOpenMessage?: string; // "Abre às 18:00"
-=======
-    /** Para countdown: próxima abertura (ex.: "Disponível a partir das 18:00") */
     nextOpen?: Date;
-    /** Horário da próxima abertura em string HH:MM para exibição */
     nextOpenAt?: string;
->>>>>>> Incoming (Background Agent changes)
+    nextOpenMessage?: string;
 };
 
 interface OperatingDay {
@@ -104,10 +98,8 @@ export async function checkRestaurantStatus(
                     isOpen: false,
                     message: `Fechado - Abre às ${nextShift.startTime} (${nextShift.name})`,
                     nextOpen,
-<<<<<<< Current (Your changes)
                     nextOpenAt: nextShift.startTime,
-=======
->>>>>>> Incoming (Background Agent changes)
+                    nextOpenMessage: `Abre às ${nextShift.startTime}`,
                 };
             } else {
                 return { isOpen: false, message: "Fechado por hoje" };
